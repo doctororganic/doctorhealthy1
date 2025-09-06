@@ -1,0 +1,193 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Application logs
+  - job_name: nutrition-backend
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nutrition-backend
+          service: nutrition-platform
+          environment: production
+          __path__: /var/log/app/*.log
+    
+    pipeline_stages:
+      # Parse JSON logs
+      - json:
+          expressions:
+            timestamp: time
+            level: level
+            message: msg
+            correlation_id: correlation_id
+            user_id: user_id
+            method: method
+            path: path
+            status: status
+            duration: duration
+            error: error
+      
+      # Parse timestamp
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      
+      # Add labels
+      - labels:
+          level:
+          correlation_id:
+          method:
+          status:
+      
+      # Drop debug logs in production
+      - drop:
+          expression: '.*level="debug".*'
+      
+      # Add severity based on level
+      - template:
+          source: severity
+          template: |
+            {{ if eq .level "error" }}critical
+            {{ else if eq .level "warn" }}warning
+            {{ else if eq .level "info" }}info
+            {{ else }}debug{{ end }}
+      
+      # Format output
+      - output:
+          source: message
+
+  # Nginx access logs
+  - job_name: nginx-access
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx-access
+          service: nginx
+          environment: production
+          __path__: /var/log/nginx/access.log
+    
+    pipeline_stages:
+      # Parse nginx log format
+      - regex:
+          expression: '^(?P<remote_addr>[\w\.]+) - (?P<remote_user>\S+) \[(?P<time_local>[^\]]+)\] "(?P<method>\S+) (?P<path>\S+) (?P<protocol>\S+)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)" "(?P<http_x_forwarded_for>[^"]*)" rt=(?P<request_time>[\d\.]+) uct="(?P<upstream_connect_time>[^"]*)" uht="(?P<upstream_header_time>[^"]*)" urt="(?P<upstream_response_time>[^"]*)"$'
+      
+      # Parse timestamp
+      - timestamp:
+          source: time_local
+          format: 02/Jan/2006:15:04:05 -0700
+      
+      # Add labels
+      - labels:
+          method:
+          status:
+          remote_addr:
+      
+      # Convert to numbers
+      - template:
+          source: status_code
+          template: '{{ .status }}'
+      
+      - template:
+          source: response_time
+          template: '{{ .request_time }}'
+      
+      # Add severity based on status code
+      - template:
+          source: severity
+          template: |
+            {{ if ge (atoi .status) 500 }}critical
+            {{ else if ge (atoi .status) 400 }}warning
+            {{ else }}info{{ end }}
+      
+      # Filter out health checks and static assets
+      - drop:
+          expression: '.*GET /health.*'
+      
+      - drop:
+          expression: '.*\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot).*'
+
+  # Nginx error logs
+  - job_name: nginx-error
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx-error
+          service: nginx
+          environment: production
+          log_type: error
+          __path__: /var/log/nginx/error.log
+    
+    pipeline_stages:
+      # Parse nginx error log format
+      - regex:
+          expression: '^(?P<timestamp>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?P<level>\w+)\] (?P<pid>\d+)#(?P<tid>\d+): (?P<message>.*)$'
+      
+      # Parse timestamp
+      - timestamp:
+          source: timestamp
+          format: 2006/01/02 15:04:05
+      
+      # Add labels
+      - labels:
+          level:
+          pid:
+      
+      # Map nginx log levels to standard levels
+      - template:
+          source: severity
+          template: |
+            {{ if eq .level "emerg" }}critical
+            {{ else if eq .level "alert" }}critical
+            {{ else if eq .level "crit" }}critical
+            {{ else if eq .level "error" }}error
+            {{ else if eq .level "warn" }}warning
+            {{ else if eq .level "notice" }}info
+            {{ else if eq .level "info" }}info
+            {{ else }}debug{{ end }}
+      
+      # Output the message
+      - output:
+          source: message
+
+  # System logs (if available)
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: system
+          service: system
+          environment: production
+          __path__: /var/log/syslog
+    
+    pipeline_stages:
+      # Basic syslog parsing
+      - regex:
+          expression: '^(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2}) (?P<hostname>\S+) (?P<program>\S+): (?P<message>.*)$'
+      
+      # Parse timestamp
+      - timestamp:
+          source: timestamp
+          format: Jan 2 15:04:05
+      
+      # Add labels
+      - labels:
+          hostname:
+          program:
+      
+      # Filter out noisy programs
+      - drop:
+          expression: '.*program="systemd".*'
+      
+      - drop:
+          expression: '.*program="kernel".*'

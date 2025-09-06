@@ -1,0 +1,80 @@
+{
+  "version": 2,
+  "name": "nutrition-platform",
+  "builds": [
+    {
+      "src": "frontend/public/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/src/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/frontend/public/index.html"
+    },
+    {
+      "src": "/diet-planning",
+      "dest": "/frontend/public/diet-planning.html"
+    },
+    {
+      "src": "/personalized-nutrition",
+      "dest": "/frontend/public/personalized-nutrition.html"
+    },
+    {
+      "src": "/workout-generator",
+      "dest": "/frontend/public/workout-generator.html"
+    },
+    {
+      "src": "/diseases",
+      "dest": "/frontend/src/diseases.html"
+    },
+    {
+      "src": "/workouts",
+      "dest": "/frontend/src/workouts.html"
+    },
+    {
+      "src": "/system-validation",
+      "dest": "/frontend/src/system-validation.html"
+    },
+    {
+      "src": "/data/(.*)",
+      "dest": "/data/$1"
+    },
+    {
+      "src": "/src/(.*)",
+      "dest": "/frontend/src/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|json|svg|png|jpg|jpeg|gif|ico))",
+      "dest": "/frontend/public/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "frontend/src/*.js": {
+      "maxDuration": 10
+    }
+  }
+}

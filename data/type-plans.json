@@ -1,0 +1,213 @@
+{
+  "diet_types": {
+    "low_carb": {
+      "name": "Low Carb Diet",
+      "name_ar": "نظام قليل الكربوهيدرات",
+      "description": "A diet that restricts carbohydrates, primarily found in sugary foods, pasta, and bread",
+      "description_ar": "نظام غذائي يقيد الكربوهيدرات الموجودة بشكل أساسي في الأطعمة السكرية والمعكرونة والخبز",
+      "macros": {
+        "carbs_percentage": 20,
+        "protein_percentage": 30,
+        "fat_percentage": 50
+      },
+      "daily_carbs_limit": 50,
+      "foods_to_emphasize": [
+        "Lean meats", "Fish", "Eggs", "Non-starchy vegetables", "Nuts and seeds", "Healthy oils"
+      ],
+      "foods_to_avoid": [
+        "Bread", "Pasta", "Rice", "Potatoes", "Sugary foods", "Most fruits"
+      ],
+      "suitable_for": ["weight_loss", "diabetes_management", "metabolic_syndrome"]
+    },
+    "keto": {
+      "name": "Ketogenic Diet",
+      "name_ar": "النظام الكيتوني",
+      "description": "A very low-carb, high-fat diet that puts the body into ketosis",
+      "description_ar": "نظام غذائي منخفض الكربوهيدرات وعالي الدهون يضع الجسم في حالة الكيتوزية",
+      "macros": {
+        "carbs_percentage": 5,
+        "protein_percentage": 20,
+        "fat_percentage": 75
+      },
+      "daily_carbs_limit": 20,
+      "foods_to_emphasize": [
+        "Fatty fish", "Meat", "Eggs", "Butter", "Nuts", "Healthy oils", "Avocados", "Low-carb vegetables"
+      ],
+      "foods_to_avoid": [
+        "Grains", "Sugar", "Fruit", "Tubers", "Legumes", "Most vegetables"
+      ],
+      "suitable_for": ["rapid_weight_loss", "epilepsy", "metabolic_disorders"]
+    },
+    "mediterranean": {
+      "name": "Mediterranean Diet",
+      "name_ar": "النظام الغذائي المتوسطي",
+      "description": "A heart-healthy eating plan based on the traditional dietary patterns of countries bordering the Mediterranean Sea",
+      "description_ar": "خطة أكل صحية للقلب تعتمد على الأنماط الغذائية التقليدية للبلدان المطلة على البحر الأبيض المتوسط",
+      "macros": {
+        "carbs_percentage": 45,
+        "protein_percentage": 20,
+        "fat_percentage": 35
+      },
+      "foods_to_emphasize": [
+        "Olive oil", "Fish", "Fruits", "Vegetables", "Whole grains", "Legumes", "Nuts"
+      ],
+      "foods_to_avoid": [
+        "Processed foods", "Red meat", "Refined sugars", "Refined grains"
+      ],
+      "suitable_for": ["heart_health", "brain_health", "longevity", "diabetes_prevention"]
+    },
+    "dash": {
+      "name": "DASH Diet",
+      "name_ar": "نظام داش الغذائي",
+      "description": "Dietary Approaches to Stop Hypertension - designed to help treat or prevent high blood pressure",
+      "description_ar": "الطرق الغذائية لوقف ارتفاع ضغط الدم - مصمم للمساعدة في علاج أو منع ارتفاع ضغط الدم",
+      "macros": {
+        "carbs_percentage": 55,
+        "protein_percentage": 18,
+        "fat_percentage": 27
+      },
+      "sodium_limit": 2300,
+      "foods_to_emphasize": [
+        "Fruits", "Vegetables", "Whole grains", "Low-fat dairy", "Lean proteins", "Nuts and seeds"
+      ],
+      "foods_to_avoid": [
+        "High-sodium foods", "Processed meats", "Sugary drinks", "Sweets"
+      ],
+      "suitable_for": ["hypertension", "heart_disease_prevention", "stroke_prevention"]
+    },
+    "balanced": {
+      "name": "Balanced Diet",
+      "name_ar": "النظام الغذائي المتوازن",
+      "description": "A well-rounded eating plan that includes all food groups in appropriate proportions",
+      "description_ar": "خطة أكل شاملة تشمل جميع المجموعات الغذائية بنسب مناسبة",
+      "macros": {
+        "carbs_percentage": 50,
+        "protein_percentage": 20,
+        "fat_percentage": 30
+      },
+      "foods_to_emphasize": [
+        "Whole grains", "Lean proteins", "Fruits", "Vegetables", "Dairy", "Healthy fats"
+      ],
+      "foods_to_avoid": [
+        "Excessive processed foods", "Too much sugar", "Excessive saturated fats"
+      ],
+      "suitable_for": ["general_health", "maintenance", "active_lifestyle"]
+    },
+    "high_carb": {
+      "name": "High Carb Diet",
+      "name_ar": "النظام عالي الكربوهيدرات",
+      "description": "A diet emphasizing carbohydrates for energy, often used by athletes",
+      "description_ar": "نظام غذائي يركز على الكربوهيدرات للطاقة، يستخدم غالباً من قبل الرياضيين",
+      "macros": {
+        "carbs_percentage": 65,
+        "protein_percentage": 15,
+        "fat_percentage": 20
+      },
+      "foods_to_emphasize": [
+        "Whole grains", "Fruits", "Vegetables", "Legumes", "Lean proteins"
+      ],
+      "foods_to_avoid": [
+        "High-fat foods", "Excessive proteins", "Refined sugars"
+      ],
+      "suitable_for": ["endurance_athletes", "muscle_building", "high_activity"]
+    },
+    "vegan": {
+      "name": "Vegan Diet",
+      "name_ar": "النظام النباتي",
+      "description": "A plant-based diet that excludes all animal products",
+      "description_ar": "نظام غذائي نباتي يستبعد جميع المنتجات الحيوانية",
+      "macros": {
+        "carbs_percentage": 55,
+        "protein_percentage": 15,
+        "fat_percentage": 30
+      },
+      "foods_to_emphasize": [
+        "Legumes", "Nuts", "Seeds", "Whole grains", "Fruits", "Vegetables", "Plant-based proteins"
+      ],
+      "foods_to_avoid": [
+        "Meat", "Fish", "Dairy", "Eggs", "Honey", "All animal products"
+      ],
+      "suitable_for": ["ethical_choice", "environmental_concerns", "certain_health_conditions"]
+    },
+    "anti_inflammatory": {
+      "name": "Anti-Inflammatory Diet",
+      "name_ar": "النظام المضاد للالتهابات",
+      "description": "A diet focused on reducing inflammation in the body",
+      "description_ar": "نظام غذائي يركز على تقليل الالتهابات في الجسم",
+      "macros": {
+        "carbs_percentage": 45,
+        "protein_percentage": 20,
+        "fat_percentage": 35
+      },
+      "foods_to_emphasize": [
+        "Fatty fish", "Leafy greens", "Berries", "Nuts", "Olive oil", "Turmeric", "Ginger"
+      ],
+      "foods_to_avoid": [
+        "Processed foods", "Refined sugars", "Trans fats", "Excessive omega-6 oils"
+      ],
+      "suitable_for": ["arthritis", "autoimmune_conditions", "chronic_inflammation"]
+    },
+    "paleo": {
+      "name": "Paleolithic Diet",
+      "name_ar": "النظام الحجري القديم",
+      "description": "A diet based on foods presumed to have been available to Paleolithic humans",
+      "description_ar": "نظام غذائي يعتمد على الأطعمة التي يُفترض أنها كانت متاحة للبشر في العصر الحجري القديم",
+      "macros": {
+        "carbs_percentage": 35,
+        "protein_percentage": 25,
+        "fat_percentage": 40
+      },
+      "foods_to_emphasize": [
+        "Meat", "Fish", "Eggs", "Vegetables", "Fruits", "Nuts", "Seeds"
+      ],
+      "foods_to_avoid": [
+        "Grains", "Legumes", "Dairy", "Processed foods", "Sugar", "Vegetable oils"
+      ],
+      "suitable_for": ["weight_loss", "digestive_issues", "autoimmune_conditions"]
+    },
+    "intermittent_fasting": {
+      "name": "Intermittent Fasting",
+      "name_ar": "الصيام المتقطع",
+      "description": "An eating pattern that cycles between periods of fasting and eating",
+      "description_ar": "نمط أكل يتناوب بين فترات الصيام والأكل",
+      "macros": {
+        "carbs_percentage": 40,
+        "protein_percentage": 30,
+        "fat_percentage": 30
+      },
+      "eating_windows": ["16:8", "18:6", "20:4", "24h"],
+      "foods_to_emphasize": [
+        "Nutrient-dense foods", "Lean proteins", "Healthy fats", "Complex carbs"
+      ],
+      "foods_to_avoid": [
+        "Processed foods", "Sugary snacks", "Empty calories"
+      ],
+      "suitable_for": ["weight_loss", "metabolic_health", "longevity"]
+    }
+  },
+  "medical_diet_recommendations": {
+    "diabetes_type1": ["low_carb", "balanced"],
+    "diabetes_type2": ["low_carb", "mediterranean", "dash"],
+    "hypertension": ["dash", "mediterranean"],
+    "heart_disease": ["mediterranean", "dash", "anti_inflammatory"],
+    "kidney_disease": ["balanced", "dash"],
+    "liver_disease": ["balanced", "anti_inflammatory"],
+    "obesity": ["low_carb", "keto", "intermittent_fasting"],
+    "celiac": ["balanced", "mediterranean", "paleo"],
+    "ibs": ["anti_inflammatory", "balanced"]
+  },
+  "goal_diet_recommendations": {
+    "weight_loss": ["low_carb", "keto", "intermittent_fasting"],
+    "weight_gain": ["high_carb", "balanced"],
+    "muscle_building": ["high_carb", "balanced"],
+    "maintenance": ["balanced", "mediterranean"],
+    "body_recomposition": ["balanced", "high_carb"]
+  },
+  "activity_diet_recommendations": {
+    "sedentary": ["balanced", "mediterranean"],
+    "lightly_active": ["balanced", "mediterranean"],
+    "moderately_active": ["balanced", "high_carb"],
+    "very_active": ["high_carb", "balanced"],
+    "extremely_active": ["high_carb"]
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "diabetes_type1": {
+    "name": "Type 1 Diabetes Meal Plan",
+    "description": "Carbohydrate-controlled meal plan for Type 1 diabetes management",
+    "guidelines": [
+      "Monitor blood glucose levels before and after meals",
+      "Coordinate carbohydrate intake with insulin timing",
+      "Aim for consistent carbohydrate amounts at each meal",
+      "Choose low glycemic index foods",
+      "Include lean proteins and healthy fats"
+    ],
+    "foods_to_emphasize": [
+      "Non-starchy vegetables",
+      "Lean proteins (chicken, fish, tofu)",
+      "Whole grains in controlled portions",
+      "Healthy fats (olive oil, nuts, avocado)",
+      "Low-fat dairy products"
+    ],
+    "foods_to_avoid": [
+      "Sugary drinks and sodas",
+      "Refined sugars and sweets",
+      "White bread and refined grains",
+      "High-sugar fruits in large quantities",
+      "Processed foods high in sodium"
+    ],
+    "sample_meals": {
+      "breakfast": {
+        "name": "Diabetes-Friendly Breakfast",
+        "ingredients": ["1/2 cup steel-cut oats", "1 tbsp chopped walnuts", "1/2 cup blueberries", "1 tsp cinnamon"],
+        "carbs": 30,
+        "calories": 250,
+        "notes": "Low glycemic index, high fiber"
+      },
+      "lunch": {
+        "name": "Grilled Chicken Salad",
+        "ingredients": ["4 oz grilled chicken breast", "2 cups mixed greens", "1/4 avocado", "1 tbsp olive oil vinaigrette"],
+        "carbs": 8,
+        "calories": 350,
+        "notes": "High protein, low carb"
+      },
+      "dinner": {
+        "name": "Baked Salmon with Vegetables",
+        "ingredients": ["5 oz baked salmon", "1 cup steamed broccoli", "1/2 cup quinoa"],
+        "carbs": 25,
+        "calories": 450,
+        "notes": "Omega-3 rich, controlled carbs"
+      }
+    }
+  },
+  "diabetes_type2": {
+    "name": "Type 2 Diabetes Meal Plan",
+    "description": "Weight management and blood sugar control meal plan",
+    "guidelines": [
+      "Focus on weight management if overweight",
+      "Choose high-fiber, low glycemic foods",
+      "Control portion sizes",
+      "Eat regular, balanced meals",
+      "Limit refined carbohydrates"
+    ],
+    "foods_to_emphasize": [
+      "Non-starchy vegetables",
+      "Lean proteins",
+      "Whole grains in moderation",
+      "Legumes and beans",
+      "Healthy fats in small amounts"
+    ],
+    "foods_to_avoid": [
+      "Sugary beverages",
+      "Refined grains",
+      "Processed snacks",
+      "High-sugar desserts",
+      "Fried foods"
+    ]
+  },
+  "hypertension": {
+    "name": "DASH Diet for Hypertension",
+    "description": "Dietary Approaches to Stop Hypertension",
+    "guidelines": [
+      "Limit sodium to less than 2,300mg daily",
+      "Increase potassium-rich foods",
+      "Choose low-fat dairy products",
+      "Emphasize fruits and vegetables",
+      "Limit alcohol consumption"
+    ],
+    "foods_to_emphasize": [
+      "Fresh fruits and vegetables",
+      "Whole grains",
+      "Low-fat dairy",
+      "Lean meats and fish",
+      "Nuts and seeds (unsalted)"
+    ],
+    "foods_to_avoid": [
+      "High-sodium processed foods",
+      "Canned soups (high sodium)",
+      "Deli meats",
+      "Pickled foods",
+      "Excessive alcohol"
+    ]
+  },
+  "heart_disease": {
+    "name": "Heart-Healthy Mediterranean Diet",
+    "description": "Cardiovascular disease prevention and management",
+    "guidelines": [
+      "Limit saturated fats to less than 7% of calories",
+      "Increase omega-3 fatty acids",
+      "Choose lean proteins",
+      "Emphasize plant-based foods",
+      "Limit trans fats completely"
+    ],
+    "foods_to_emphasize": [
+      "Fatty fish (salmon, mackerel, sardines)",
+      "Olive oil",
+      "Nuts and seeds",
+      "Fruits and vegetables",
+      "Whole grains"
+    ],
+    "foods_to_avoid": [
+      "Trans fats",
+      "High saturated fat foods",
+      "Excessive red meat",
+      "Processed meats",
+      "High-sodium foods"
+    ]
+  },
+  "kidney_disease": {
+    "name": "Kidney-Friendly Diet",
+    "description": "Chronic kidney disease nutritional management",
+    "guidelines": [
+      "Monitor protein intake based on stage",
+      "Limit phosphorus and potassium",
+      "Control sodium intake",
+      "Maintain adequate calories",
+      "Monitor fluid intake if required"
+    ],
+    "foods_to_emphasize": [
+      "High-quality proteins in moderation",
+      "Low-phosphorus grains",
+      "Apples, berries, grapes",
+      "Cauliflower, cabbage, bell peppers",
+      "Olive oil and other healthy fats"
+    ],
+    "foods_to_avoid": [
+      "High-phosphorus foods (dairy, nuts)",
+      "High-potassium foods (bananas, oranges)",
+      "Processed foods",
+      "Dark sodas",
+      "Excessive protein"
+    ]
+  },
+  "liver_disease": {
+    "name": "Liver-Protective Diet",
+    "description": "Nutritional support for liver health",
+    "guidelines": [
+      "Avoid alcohol completely",
+      "Limit sodium intake",
+      "Monitor protein based on condition",
+      "Maintain healthy weight",
+      "Avoid hepatotoxic substances"
+    ],
+    "foods_to_emphasize": [
+      "Lean proteins",
+      "Fresh fruits and vegetables",
+      "Whole grains",
+      "Low-sodium foods",
+      "Antioxidant-rich foods"
+    ],
+    "foods_to_avoid": [
+      "Alcohol",
+      "High-sodium foods",
+      "Processed foods",
+      "High-fat foods",
+      "Raw or undercooked shellfish"
+    ]
+  },
+  "obesity": {
+    "name": "Weight Management Plan",
+    "description": "Calorie-controlled diet for healthy weight loss",
+    "guidelines": [
+      "Create moderate calorie deficit",
+      "Focus on nutrient-dense foods",
+      "Control portion sizes",
+      "Increase physical activity",
+      "Eat regular, balanced meals"
+    ],
+    "foods_to_emphasize": [
+      "Non-starchy vegetables",
+      "Lean proteins",
+      "Whole grains in moderation",
+      "Fruits in controlled portions",
+      "Healthy fats in small amounts"
+    ],
+    "foods_to_avoid": [
+      "High-calorie beverages",
+      "Processed snacks",
+      "Fried foods",
+      "High-sugar desserts",
+      "Large portion sizes"
+    ]
+  },
+  "celiac": {
+    "name": "Gluten-Free Diet",
+    "description": "Strict gluten elimination for celiac disease",
+    "guidelines": [
+      "Avoid all gluten-containing grains",
+      "Read labels carefully",
+      "Prevent cross-contamination",
+      "Choose naturally gluten-free foods",
+      "Ensure adequate fiber and B vitamins"
+    ],
+    "foods_to_emphasize": [
+      "Rice, quinoa, corn",
+      "Fresh fruits and vegetables",
+      "Lean meats and fish",
+      "Dairy products (if tolerated)",
+      "Gluten-free oats"
+    ],
+    "foods_to_avoid": [
+      "Wheat, barley, rye",
+      "Most breads and pastas",
+      "Beer and malt beverages",
+      "Processed foods with gluten",
+      "Cross-contaminated oats"
+    ]
+  },
+  "ibs": {
+    "name": "Low FODMAP Diet",
+    "description": "Irritable bowel syndrome symptom management",
+    "guidelines": [
+      "Follow low FODMAP elimination phase",
+      "Gradually reintroduce foods",
+      "Identify personal triggers",
+      "Maintain balanced nutrition",
+      "Consider stress management"
+    ],
+    "foods_to_emphasize": [
+      "Low FODMAP fruits (berries, citrus)",
+      "Low FODMAP vegetables (carrots, spinach)",
+      "Lean proteins",
+      "Gluten-free grains",
+      "Lactose-free dairy"
+    ],
+    "foods_to_avoid": [
+      "High FODMAP fruits (apples, pears)",
+      "High FODMAP vegetables (onions, garlic)",
+      "Wheat and rye",
+      "Regular dairy products",
+      "Legumes and beans"
+    ]
+  }
+}

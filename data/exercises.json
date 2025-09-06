@@ -1,0 +1,498 @@
+{
+  "exercises": {
+    "chest": [
+      {
+        "id": "push_ups",
+        "name": "Push-ups",
+        "name_ar": "تمرين الضغط",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["chest", "triceps", "shoulders"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["wrist", "shoulder"],
+        "alternatives": ["incline_push_ups", "knee_push_ups"],
+        "form_cues": [
+          "Keep body in straight line",
+          "Lower chest to floor",
+          "Push through palms",
+          "Engage core throughout"
+        ],
+        "form_cues_ar": [
+          "حافظ على استقامة الجسم",
+          "اخفض الصدر للأرض",
+          "ادفع من خلال راحة اليد",
+          "شد عضلات البطن"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "8-12", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "12-20", "rest": 45},
+          "advanced": {"sets": 5, "reps": "20-30", "rest": 30}
+        }
+      },
+      {
+        "id": "bench_press",
+        "name": "Bench Press",
+        "name_ar": "تمرين البنش برس",
+        "equipment": ["barbell", "gym_access"],
+        "muscle_groups": ["chest", "triceps", "shoulders"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["shoulder", "wrist"],
+        "alternatives": ["dumbbell_press", "push_ups"],
+        "form_cues": [
+          "Retract shoulder blades",
+          "Lower bar to chest",
+          "Drive through feet",
+          "Control the descent"
+        ],
+        "form_cues_ar": [
+          "اسحب لوحي الكتف للخلف",
+          "اخفض البار للصدر",
+          "ادفع من خلال القدمين",
+          "تحكم في النزول"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "8-10", "rest": 90},
+          "intermediate": {"sets": 4, "reps": "6-8", "rest": 120},
+          "advanced": {"sets": 5, "reps": "4-6", "rest": 180}
+        }
+      },
+      {
+        "id": "dumbbell_flyes",
+        "name": "Dumbbell Flyes",
+        "name_ar": "تمرين الفراشة بالدمبل",
+        "equipment": ["dumbbells"],
+        "muscle_groups": ["chest"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["shoulder"],
+        "alternatives": ["cable_flyes", "push_ups"],
+        "form_cues": [
+          "Slight bend in elbows",
+          "Wide arc motion",
+          "Squeeze chest at top",
+          "Control the weight"
+        ],
+        "form_cues_ar": [
+          "انحناء طفيف في المرفقين",
+          "حركة قوسية واسعة",
+          "اضغط الصدر في الأعلى",
+          "تحكم في الوزن"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "10-12", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "8-12", "rest": 75},
+          "advanced": {"sets": 4, "reps": "12-15", "rest": 60}
+        }
+      }
+    ],
+    "back": [
+      {
+        "id": "pull_ups",
+        "name": "Pull-ups",
+        "name_ar": "تمرين العقلة",
+        "equipment": ["pull_up_bar"],
+        "muscle_groups": ["lats", "rhomboids", "biceps"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["shoulder", "elbow"],
+        "alternatives": ["assisted_pull_ups", "lat_pulldowns"],
+        "form_cues": [
+          "Dead hang start",
+          "Pull chest to bar",
+          "Control descent",
+          "Full range of motion"
+        ],
+        "form_cues_ar": [
+          "ابدأ بالتعلق الكامل",
+          "اسحب الصدر للبار",
+          "تحكم في النزول",
+          "مدى حركة كامل"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "3-6", "rest": 120},
+          "intermediate": {"sets": 4, "reps": "6-10", "rest": 90},
+          "advanced": {"sets": 5, "reps": "10-15", "rest": 60}
+        }
+      },
+      {
+        "id": "bent_over_rows",
+        "name": "Bent Over Rows",
+        "name_ar": "تمرين السحب المنحني",
+        "equipment": ["barbell", "dumbbells"],
+        "muscle_groups": ["lats", "rhomboids", "rear_delts"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["lower_back"],
+        "alternatives": ["seated_rows", "resistance_band_rows"],
+        "form_cues": [
+          "Hinge at hips",
+          "Neutral spine",
+          "Pull to lower chest",
+          "Squeeze shoulder blades"
+        ],
+        "form_cues_ar": [
+          "انحني من الوركين",
+          "عمود فقري محايد",
+          "اسحب للصدر السفلي",
+          "اضغط لوحي الكتف"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "8-10", "rest": 90},
+          "intermediate": {"sets": 4, "reps": "8-12", "rest": 75},
+          "advanced": {"sets": 4, "reps": "10-15", "rest": 60}
+        }
+      }
+    ],
+    "legs": [
+      {
+        "id": "squats",
+        "name": "Squats",
+        "name_ar": "تمرين القرفصاء",
+        "equipment": ["bodyweight", "barbell", "dumbbells"],
+        "muscle_groups": ["quadriceps", "glutes", "hamstrings"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["knee", "ankle", "lower_back"],
+        "alternatives": ["box_squats", "wall_sits"],
+        "form_cues": [
+          "Feet shoulder-width apart",
+          "Sit back and down",
+          "Knees track over toes",
+          "Drive through heels"
+        ],
+        "form_cues_ar": [
+          "القدمان بعرض الكتفين",
+          "اجلس للخلف والأسفل",
+          "الركبتان فوق أصابع القدم",
+          "ادفع من خلال الكعبين"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "10-15", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "12-20", "rest": 75},
+          "advanced": {"sets": 5, "reps": "15-25", "rest": 60}
+        }
+      },
+      {
+        "id": "deadlifts",
+        "name": "Deadlifts",
+        "name_ar": "تمرين الرفعة الميتة",
+        "equipment": ["barbell", "dumbbells"],
+        "muscle_groups": ["hamstrings", "glutes", "lower_back"],
+        "difficulty": "advanced",
+        "injury_restrictions": ["lower_back", "knee"],
+        "alternatives": ["romanian_deadlifts", "glute_bridges"],
+        "form_cues": [
+          "Bar close to shins",
+          "Neutral spine",
+          "Drive hips forward",
+          "Squeeze glutes at top"
+        ],
+        "form_cues_ar": [
+          "البار قريب من الساقين",
+          "عمود فقري محايد",
+          "ادفع الوركين للأمام",
+          "اضغط الأرداف في الأعلى"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "5-8", "rest": 120},
+          "intermediate": {"sets": 4, "reps": "5-8", "rest": 150},
+          "advanced": {"sets": 5, "reps": "3-5", "rest": 180}
+        }
+      },
+      {
+        "id": "lunges",
+        "name": "Lunges",
+        "name_ar": "تمرين الطعن",
+        "equipment": ["bodyweight", "dumbbells"],
+        "muscle_groups": ["quadriceps", "glutes", "hamstrings"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["knee", "ankle"],
+        "alternatives": ["step_ups", "split_squats"],
+        "form_cues": [
+          "Step forward with control",
+          "Lower back knee to ground",
+          "Keep front knee over ankle",
+          "Push back to start"
+        ],
+        "form_cues_ar": [
+          "خطوة للأمام بتحكم",
+          "اخفض الركبة الخلفية للأرض",
+          "حافظ على الركبة الأمامية فوق الكاحل",
+          "ادفع للعودة للبداية"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "10-12 each leg", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "12-15 each leg", "rest": 60},
+          "advanced": {"sets": 4, "reps": "15-20 each leg", "rest": 45}
+        }
+      }
+    ],
+    "shoulders": [
+      {
+        "id": "overhead_press",
+        "name": "Overhead Press",
+        "name_ar": "تمرين الضغط العلوي",
+        "equipment": ["barbell", "dumbbells"],
+        "muscle_groups": ["shoulders", "triceps", "core"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["shoulder", "neck"],
+        "alternatives": ["seated_press", "pike_push_ups"],
+        "form_cues": [
+          "Tight core",
+          "Press straight up",
+          "Don't arch back",
+          "Full lockout"
+        ],
+        "form_cues_ar": [
+          "شد عضلات البطن",
+          "اضغط مباشرة للأعلى",
+          "لا تقوس الظهر",
+          "إغلاق كامل"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "8-10", "rest": 90},
+          "intermediate": {"sets": 4, "reps": "6-10", "rest": 120},
+          "advanced": {"sets": 4, "reps": "8-12", "rest": 90}
+        }
+      },
+      {
+        "id": "lateral_raises",
+        "name": "Lateral Raises",
+        "name_ar": "تمرين الرفع الجانبي",
+        "equipment": ["dumbbells", "resistance_bands"],
+        "muscle_groups": ["side_delts"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["shoulder"],
+        "alternatives": ["band_lateral_raises", "wall_slides"],
+        "form_cues": [
+          "Slight forward lean",
+          "Lead with pinkies",
+          "Stop at shoulder height",
+          "Control the descent"
+        ],
+        "form_cues_ar": [
+          "ميل طفيف للأمام",
+          "قد بالخناصر",
+          "توقف عند مستوى الكتف",
+          "تحكم في النزول"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "12-15", "rest": 45},
+          "intermediate": {"sets": 4, "reps": "12-15", "rest": 45},
+          "advanced": {"sets": 4, "reps": "15-20", "rest": 30}
+        }
+      }
+    ],
+    "arms": [
+      {
+        "id": "bicep_curls",
+        "name": "Bicep Curls",
+        "name_ar": "تمرين عضلة الباي",
+        "equipment": ["dumbbells", "barbell", "resistance_bands"],
+        "muscle_groups": ["biceps"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["elbow", "wrist"],
+        "alternatives": ["hammer_curls", "band_curls"],
+        "form_cues": [
+          "Keep elbows at sides",
+          "Full range of motion",
+          "Squeeze at the top",
+          "Control the negative"
+        ],
+        "form_cues_ar": [
+          "حافظ على المرفقين بالجانبين",
+          "مدى حركة كامل",
+          "اضغط في الأعلى",
+          "تحكم في النزول"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "10-12", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "10-15", "rest": 60},
+          "advanced": {"sets": 4, "reps": "12-20", "rest": 45}
+        }
+      },
+      {
+        "id": "tricep_dips",
+        "name": "Tricep Dips",
+        "name_ar": "تمرين التراي",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["triceps", "shoulders"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["shoulder", "wrist"],
+        "alternatives": ["bench_dips", "tricep_pushdowns"],
+        "form_cues": [
+          "Keep body close to bench",
+          "Lower until 90 degrees",
+          "Push through palms",
+          "Don't flare elbows"
+        ],
+        "form_cues_ar": [
+          "حافظ على الجسم قريب من المقعد",
+          "اخفض حتى 90 درجة",
+          "ادفع من خلال راحة اليد",
+          "لا تفتح المرفقين"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "6-10", "rest": 75},
+          "intermediate": {"sets": 4, "reps": "8-12", "rest": 60},
+          "advanced": {"sets": 4, "reps": "12-20", "rest": 45}
+        }
+      }
+    ],
+    "core": [
+      {
+        "id": "planks",
+        "name": "Planks",
+        "name_ar": "تمرين البلانك",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["core", "shoulders"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["lower_back", "wrist"],
+        "alternatives": ["wall_planks", "knee_planks"],
+        "form_cues": [
+          "Straight line from head to heels",
+          "Engage core",
+          "Don't let hips sag",
+          "Breathe normally"
+        ],
+        "form_cues_ar": [
+          "خط مستقيم من الرأس للكعبين",
+          "شد عضلات البطن",
+          "لا تدع الوركين تهبط",
+          "تنفس بشكل طبيعي"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "20-30 seconds", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "30-60 seconds", "rest": 45},
+          "advanced": {"sets": 4, "reps": "60-90 seconds", "rest": 30}
+        }
+      },
+      {
+        "id": "mountain_climbers",
+        "name": "Mountain Climbers",
+        "name_ar": "تمرين متسلق الجبال",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["core", "cardio"],
+        "difficulty": "intermediate",
+        "injury_restrictions": ["wrist", "knee"],
+        "alternatives": ["standing_knee_raises", "dead_bugs"],
+        "form_cues": [
+          "Start in plank position",
+          "Drive knees to chest",
+          "Keep hips level",
+          "Maintain rhythm"
+        ],
+        "form_cues_ar": [
+          "ابدأ في وضعية البلانك",
+          "ادفع الركبتين للصدر",
+          "حافظ على مستوى الوركين",
+          "حافظ على الإيقاع"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "20-30 seconds", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "30-45 seconds", "rest": 45},
+          "advanced": {"sets": 4, "reps": "45-60 seconds", "rest": 30}
+        }
+      }
+    ],
+    "cardio": [
+      {
+        "id": "jumping_jacks",
+        "name": "Jumping Jacks",
+        "name_ar": "تمرين القفز المفتوح",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["cardio", "legs"],
+        "difficulty": "beginner",
+        "injury_restrictions": ["knee", "ankle"],
+        "alternatives": ["step_touches", "arm_circles"],
+        "form_cues": [
+          "Land softly",
+          "Keep core engaged",
+          "Full arm extension",
+          "Maintain rhythm"
+        ],
+        "form_cues_ar": [
+          "اهبط بنعومة",
+          "حافظ على شد البطن",
+          "مد الذراعين بالكامل",
+          "حافظ على الإيقاع"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "30 seconds", "rest": 60},
+          "intermediate": {"sets": 4, "reps": "45 seconds", "rest": 45},
+          "advanced": {"sets": 4, "reps": "60 seconds", "rest": 30}
+        }
+      },
+      {
+        "id": "burpees",
+        "name": "Burpees",
+        "name_ar": "تمرين البربي",
+        "equipment": ["bodyweight"],
+        "muscle_groups": ["full_body", "cardio"],
+        "difficulty": "advanced",
+        "injury_restrictions": ["knee", "wrist", "lower_back"],
+        "alternatives": ["squat_thrusts", "step_ups"],
+        "form_cues": [
+          "Squat down, hands to floor",
+          "Jump feet back to plank",
+          "Do a push-up",
+          "Jump feet forward, then up"
+        ],
+        "form_cues_ar": [
+          "اجلس، ضع اليدين على الأرض",
+          "اقفز بالقدمين للخلف للبلانك",
+          "قم بتمرين ضغط",
+          "اقفز بالقدمين للأمام ثم للأعلى"
+        ],
+        "sets_reps": {
+          "beginner": {"sets": 3, "reps": "5-8", "rest": 90},
+          "intermediate": {"sets": 4, "reps": "8-12", "rest": 75},
+          "advanced": {"sets": 4, "reps": "12-20", "rest": 60}
+        }
+      }
+    ]
+  },
+  "workout_templates": {
+    "weight_loss": {
+      "focus": "High intensity, circuit training, cardio emphasis",
+      "structure": "3-4 exercises per circuit, 3-4 circuits",
+      "rest_periods": "Short (30-45 seconds)",
+      "frequency": "5-6 days per week"
+    },
+    "muscle_gain": {
+      "focus": "Progressive overload, compound movements",
+      "structure": "4-6 exercises per muscle group",
+      "rest_periods": "Moderate to long (60-120 seconds)",
+      "frequency": "4-5 days per week"
+    },
+    "endurance": {
+      "focus": "High repetitions, functional movements",
+      "structure": "5-8 exercises, circuit style",
+      "rest_periods": "Short to moderate (30-60 seconds)",
+      "frequency": "5-6 days per week"
+    },
+    "strength": {
+      "focus": "Heavy weights, compound movements",
+      "structure": "3-5 exercises per session",
+      "rest_periods": "Long (120-180 seconds)",
+      "frequency": "3-4 days per week"
+    }
+  },
+  "injury_modifications": {
+    "lower_back": {
+      "avoid": ["deadlifts", "bent_over_rows", "overhead_press"],
+      "modify": ["squats", "lunges"],
+      "recommend": ["planks", "bird_dogs", "wall_sits"]
+    },
+    "knee": {
+      "avoid": ["squats", "lunges", "jumping_jacks", "burpees"],
+      "modify": ["deadlifts"],
+      "recommend": ["upper_body_exercises", "seated_exercises"]
+    },
+    "shoulder": {
+      "avoid": ["overhead_press", "lateral_raises", "bench_press"],
+      "modify": ["push_ups", "pull_ups"],
+      "recommend": ["lower_body_exercises", "core_exercises"]
+    },
+    "wrist": {
+      "avoid": ["push_ups", "planks", "burpees"],
+      "modify": ["use_fists_instead_of_palms"],
+      "recommend": ["standing_exercises", "machine_exercises"]
+    }
+  }
+}
