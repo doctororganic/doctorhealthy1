@@ -1,0 +1,87 @@
+{
+  "name": "nutrition-platform-automated-recovery",
+  "version": "1.0.0",
+  "description": "Automated error detection and recovery system for Nutrition Platform",
+  "main": "automated-recovery.js",
+  "scripts": {
+    "start": "node automated-recovery.js",
+    "monitor": "node automated-recovery.js --monitor",
+    "check": "node automated-recovery.js --check",
+    "recover": "node automated-recovery.js --recover",
+    "report": "node automated-recovery.js --report",
+    "test": "jest --verbose",
+    "lint": "eslint .",
+    "build": "npm run lint && npm test",
+    "deploy": "npm run build && node deploy.js"
+  },
+  "keywords": [
+    "monitoring",
+    "recovery",
+    "automation",
+    "health-check",
+    "performance",
+    "security",
+    "alerting"
+  ],
+  "author": "Nutrition Platform Team",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "winston": "^3.11.0",
+    "prom-client": "^14.2.0",
+    "node-cron": "^3.0.2",
+    "redis": "^4.6.8",
+    "pg": "^8.11.3",
+    "mysql2": "^3.6.3",
+    "mongodb": "^5.8.0",
+    "joi": "^17.10.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "node-notifier": "^10.0.1",
+    "nodemailer": "^6.9.7",
+    "@slack/webhook": "^6.1.0",
+    "twilio": "^4.20.0",
+    "firebase-admin": "^11.11.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.54.0",
+    "prettier": "^3.1.0",
+    "nodemon": "^3.0.1",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.8.7",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/doctorhealthy1/nutrition-platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/doctorhealthy1/nutrition-platform/issues"
+  },
+  "homepage": "https://doctorhealthy1.com",
+  "config": {
+    "monitoring_interval": 30000,
+    "max_retries": 3,
+    "alert_timeout": 60000
+  },
+  "volumes": [
+    "/app/logs",
+    "/app/config",
+    "/app/backups"
+  ],
+  "environment": {
+    "NODE_ENV": "production",
+    "MONITORING_ENABLED": "true",
+    "ALERTING_ENABLED": "true",
+    "AUTO_RECOVERY_ENABLED": "true"
+  }
+}

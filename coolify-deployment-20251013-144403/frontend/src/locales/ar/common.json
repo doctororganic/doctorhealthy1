@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "منصة التغذية الصحية",
+    "description": "منصة شاملة للتغذية الصحية والحلال",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "تم بنجاح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "nutrition": "التغذية",
+    "recipes": "الوصفات",
+    "meal_planning": "تخطيط الوجبات",
+    "health_tracking": "متابعة الصحة",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "nutrition": {
+    "calories": "السعرات الحرارية",
+    "protein": "البروتين",
+    "carbs": "الكربوهيدرات",
+    "fat": "الدهون",
+    "fiber": "الألياف",
+    "sugar": "السكر",
+    "sodium": "الصوديوم",
+    "vitamins": "الفيتامينات",
+    "minerals": "المعادن",
+    "daily_intake": "الاستهلاك اليومي",
+    "recommended": "الموصى به",
+    "consumed": "المستهلك",
+    "remaining": "المتبقي"
+  },
+  "halal": {
+    "certified": "حلال معتمد",
+    "status": "الحالة الحلال",
+    "ingredients": "المكونات",
+    "alternatives": "البدائل",
+    "suggestion": "اقتراح",
+    "pork_alternative": "بديل لحم الخنزير: لحم البقر",
+    "alcohol_free": "خالي من الكحول",
+    "gelatin_alternative": "بديل الجيلاتين: أجار أجار"
+  },
+  "medical": {
+    "disclaimer": "إخلاء المسؤولية الطبية",
+    "disclaimer_text": "هذه المعلومات للأغراض التعليمية فقط ولا تشكل نصيحة طبية. استشر طبيبك قبل إجراء أي تغييرات على نظامك الغذائي.",
+    "consult_doctor": "استشر طبيبك",
+    "not_medical_advice": "ليست نصيحة طبية",
+    "educational_only": "للأغراض التعليمية فقط"
+  },
+  "forms": {
+    "required": "مطلوب",
+    "invalid_email": "بريد إلكتروني غير صحيح",
+    "password_too_short": "كلمة المرور قصيرة جداً",
+    "passwords_dont_match": "كلمات المرور غير متطابقة",
+    "please_fill": "يرجى ملء هذا الحقل",
+    "submit": "إرسال",
+    "reset": "إعادة تعيين"
+  },
+  "time": {
+    "breakfast": "الإفطار",
+    "lunch": "الغداء",
+    "dinner": "العشاء",
+    "snack": "وجبة خفيفة",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "tomorrow": "غداً",
+    "this_week": "هذا الأسبوع",
+    "this_month": "هذا الشهر"
+  },
+  "units": {
+    "grams": "جرام",
+    "kg": "كيلوجرام",
+    "ml": "مليلتر",
+    "liters": "لتر",
+    "cups": "أكواب",
+    "tablespoons": "ملاعق كبيرة",
+    "teaspoons": "ملاعق صغيرة",
+    "pieces": "قطع",
+    "servings": "حصص"
+  }
+}

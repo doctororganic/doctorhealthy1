@@ -1,78 +1,30 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
-  external_labels:
-    monitor: 'nutrition-platform'
 
 rule_files:
-  - "alert_rules.yml"
-
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-          - alertmanager:9093
+  # - "first_rules.yml"
+  # - "second_rules.yml"
 
 scrape_configs:
-  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
-    scrape_interval: 30s
-    metrics_path: /metrics
 
-  # Go Backend Application
-  - job_name: 'nutrition-backend'
+  - job_name: 'nutrition-app'
     static_configs:
-      - targets: ['backend:9090']
-    scrape_interval: 15s
-    metrics_path: /metrics
-    scrape_timeout: 10s
-    honor_labels: true
-    params:
-      format: ['prometheus']
+      - targets: ['nutrition-app:9464']
+    scrape_interval: 5s
+    metrics_path: '/metrics'
 
-  # Nginx Metrics (if nginx-prometheus-exporter is used)
-  - job_name: 'nginx'
+  - job_name: 'grafana'
     static_configs:
-      - targets: ['nginx-exporter:9113']
-    scrape_interval: 30s
-    metrics_path: /metrics
+      - targets: ['grafana:3000']
 
-  # PostgreSQL Metrics (if postgres_exporter is used)
-  - job_name: 'postgres'
+  - job_name: 'loki'
     static_configs:
-      - targets: ['postgres-exporter:9187']
-    scrape_interval: 30s
-    metrics_path: /metrics
+      - targets: ['loki:3100']
 
-  # Redis Metrics (if redis_exporter is used)
-  - job_name: 'redis'
+  - job_name: 'node-exporter'
     static_configs:
-      - targets: ['redis-exporter:9121']
-    scrape_interval: 30s
-    metrics_path: /metrics
-
-  # Node Exporter for system metrics
-  - job_name: 'node'
-    static_configs:
-      - targets: ['node-exporter:9100']
-    scrape_interval: 30s
-    metrics_path: /metrics
-
-  # Custom health checks
-  - job_name: 'blackbox'
-    metrics_path: /probe
-    params:
-      module: [http_2xx]
-    static_configs:
-      - targets:
-        - http://nginx/health
-        - http://backend:8080/health
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: blackbox-exporter:9115
+      - targets: ['host.docker.internal:9100']

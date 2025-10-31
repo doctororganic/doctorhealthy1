@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  nutrition-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nutrition-platform-backend
+    restart: unless-stopped
+    user: "1000:1000"  # Run as non-root user
+
+    # Environment variables - all from external .env file
+    env_file:
+      - .env
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - ENVIRONMENT=production
+
+    # Security limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+    # Volumes for persistent data with proper permissions
+    volumes:
+      - ./data:/app/data:rw
+      - ./logs:/app/logs:rw
+      - ./secrets:/app/secrets:ro  # Read-only secrets
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Security settings
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
+    # Labels for Coolify with security headers
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nutrition-platform.rule=Host(`api.doctorhealthy1.com`)"
+      - "traefik.http.routers.nutrition-platform.entrypoints=websecure"
+      - "traefik.http.routers.nutrition-platform.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nutrition-platform.loadbalancer.server.port=8080"
+      # Security headers
+      - "traefik.http.middlewares.nutrition-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.nutrition-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.nutrition-headers.headers.customresponseheaders.X-Frame-Options=DENY"
+      - "traefik.http.middlewares.nutrition-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.middlewares.nutrition-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
+      - "traefik.http.routers.nutrition-platform.middlewares=nutrition-headers@docker"
+
+    # Network
+    networks:
+      - web
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: nutrition-platform-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - web
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
+networks:
+  web:
+    external: true
+    name: web
+
+volumes:
+  redis_data:
+    driver: local

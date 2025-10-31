@@ -1,0 +1,6 @@
+{
+  "status": "healthy",
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "version": "1.0.0",
+  "environment": "production"
+}

@@ -1,0 +1,35 @@
+{
+  "name": "nutrition-platform",
+  "description": "AI-powered nutrition and health management platform",
+  "server_uuid": "x8gck8ggggsgkggg4coosg0g",
+  "domains": ["super.doctorhealthy1.com"],
+  "build_pack": "dockercompose",
+  "port": 3000,
+  "environment_variables": {
+    "NODE_ENV": "production",
+    "PORT": "8080",
+    "DB_HOST": "postgres",
+    "DB_PORT": "5432",
+    "DB_NAME": "nutrition_platform",
+    "DB_USER": "nutrition_user",
+    "DB_PASSWORD": "nutrition_pass",
+    "REDIS_HOST": "redis",
+    "REDIS_PORT": "6379",
+    "ENVIRONMENT": "production",
+    "NEXT_PUBLIC_API_URL": "http://backend:8080"
+  },
+  "source": {
+    "type": "git",
+    "repository": "nutrition-platform",
+    "branch": "main"
+  },
+  "health_check": {
+    "path": "/health",
+    "port": 8080,
+    "interval": 30,
+    "timeout": 10,
+    "retries": 3
+  },
+  "force_https": true,
+  "is_static": false
+}

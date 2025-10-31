@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#20c997;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="38" fill="url(#healthGradient)"/>
+  <g transform="translate(48, 48)">
+    <!-- Heart shape -->
+    <path d="M48 87c-12-20-32-27-32-48 0-12 9-21 21-21s21 9 21 21c0-12 9-21 21-21s21 9 21 21c0 21-20 28-32 48z" fill="white"/>
+    <!-- Plus sign -->
+    <rect x="42" y="21" width="12" height="42" fill="#28a745" rx="6"/>
+    <rect x="27" y="36" width="42" height="12" fill="#28a745" rx="6"/>
+  </g>
+</svg>

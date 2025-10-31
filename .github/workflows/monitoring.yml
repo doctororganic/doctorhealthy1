@@ -1,0 +1,99 @@
+name: Continuous Monitoring
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Production Health
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://super.doctorhealthy1.com/health)
+          if [ $response -ne 200 ]; then
+            echo "❌ Health check failed with status $response"
+            exit 1
+          fi
+          echo "✅ Health check passed"
+      
+      - name: Check API Endpoints
+        run: |
+          # Test API info
+          curl -f https://super.doctorhealthy1.com/api/info || exit 1
+          
+          # Test nutrition analysis
+          curl -f -X POST https://super.doctorhealthy1.com/api/nutrition/analyze \
+            -H "Content-Type: application/json" \
+            -d '{"food":"apple","quantity":100,"unit":"g"}' || exit 1
+          
+          echo "✅ All API endpoints working"
+      
+      - name: Check Response Time
+        run: |
+          start=$(date +%s%N)
+          curl -s https://super.doctorhealthy1.com/health > /dev/null
+          end=$(date +%s%N)
+          duration=$(( (end - start) / 1000000 ))
+          
+          echo "Response time: ${duration}ms"
+          
+          if [ $duration -gt 2000 ]; then
+            echo "⚠️ Response time is slow: ${duration}ms"
+            exit 1
+          fi
+          
+          echo "✅ Response time is good: ${duration}ms"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "🚨 Monitoring alert: Service health check failed"
+          # Add notification logic (Slack, email, etc.)
+
+  performance-test:
+    name: Performance Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Apache Bench
+        run: sudo apt-get update && sudo apt-get install -y apache2-utils
+      
+      - name: Run load test
+        run: |
+          ab -n 1000 -c 10 -g results.tsv https://super.doctorhealthy1.com/health
+          
+          # Check for failures
+          failures=$(grep "Failed requests" results.tsv | awk '{print $3}')
+          if [ "$failures" != "0" ]; then
+            echo "❌ Load test failed with $failures failed requests"
+            exit 1
+          fi
+          
+          echo "✅ Load test passed"
+
+  ssl-check:
+    name: SSL Certificate Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check SSL Certificate
+        run: |
+          expiry=$(echo | openssl s_client -servername super.doctorhealthy1.com \
+            -connect super.doctorhealthy1.com:443 2>/dev/null | \
+            openssl x509 -noout -enddate | cut -d= -f2)
+          
+          expiry_epoch=$(date -d "$expiry" +%s)
+          now_epoch=$(date +%s)
+          days_left=$(( (expiry_epoch - now_epoch) / 86400 ))
+          
+          echo "SSL certificate expires in $days_left days"
+          
+          if [ $days_left -lt 30 ]; then
+            echo "⚠️ SSL certificate expires soon: $days_left days"
+            exit 1
+          fi
+          
+          echo "✅ SSL certificate is valid"

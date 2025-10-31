@@ -1,0 +1,61 @@
+# Multi-stage build for PWA Frontend
+FROM node:20-alpine AS builder
+
+# Install dependencies
+RUN apk add --no-cache git
+
+WORKDIR /app
+
+# Copy package files
+COPY frontend/package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY frontend/ ./
+
+# Build stage - create production build
+FROM nginx:alpine AS production
+
+# Install security updates
+RUN apk upgrade --no-cache
+
+# Create nginx user and group
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+
+# Copy custom nginx configuration
+COPY nginx/production.conf /etc/nginx/nginx.conf
+
+# Copy built files from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy PWA files to root (required for service worker)
+COPY --from=builder /app/dist/sw.js /usr/share/nginx/html/sw.js
+COPY --from=builder /app/dist/manifest.json /usr/share/nginx/html/manifest.json
+
+# Create necessary directories
+RUN mkdir -p /var/cache/nginx/client_temp \
+             /var/cache/nginx/proxy_temp \
+             /var/cache/nginx/fastcgi_temp \
+             /var/cache/nginx/scgi_temp \
+             /var/log/nginx
+
+# Set proper permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+                         /var/cache/nginx \
+                         /var/log/nginx \
+                         /etc/nginx/nginx.conf
+
+# Switch to non-root user
+USER nginx
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

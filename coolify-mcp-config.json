@@ -1,0 +1,11 @@
+{
+  "name": "coolify",
+  "server": {
+    "command": "coolify-mcp-server",
+    "args": []
+  },
+  "environment": {
+    "COOLIFY_API_TOKEN": "11|G970bmcyMa4CoQramiBIlIy1upTSCnkcd6gbPbc9b2f45f2a",
+    "COOLIFY_API_URL": "https://api.doctorhealthy1.com/"
+  }
+}

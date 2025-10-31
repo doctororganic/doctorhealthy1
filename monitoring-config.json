@@ -1,0 +1,126 @@
+{
+  "metrics": {
+    "enabled": true,
+    "endpoint": "/metrics",
+    "interval": 15,
+    "collectors": {
+      "cpu": true,
+      "memory": true,
+      "disk": true,
+      "network": true,
+      "http": true,
+      "database": true,
+      "cache": true
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "destinations": [
+      {
+        "type": "console",
+        "enabled": true
+      },
+      {
+        "type": "file",
+        "enabled": true,
+        "path": "/app/logs/application.log",
+        "maxSize": 10,
+        "maxBackups": 5,
+        "maxAge": 30,
+        "compress": true
+      }
+    ],
+    "fields": {
+      "timestamp": true,
+      "level": true,
+      "message": true,
+      "caller": true,
+      "requestId": true,
+      "userId": true,
+      "ip": true,
+      "userAgent": true,
+      "path": true,
+      "method": true,
+      "statusCode": true,
+      "responseTime": true
+    }
+  },
+  "tracing": {
+    "enabled": true,
+    "samplingRate": 0.1,
+    "propagation": "w3c"
+  },
+  "alerting": {
+    "enabled": true,
+    "rules": [
+      {
+        "name": "high_cpu_usage",
+        "description": "CPU usage is high",
+        "query": "cpu_usage > 80",
+        "duration": "5m",
+        "severity": "warning"
+      },
+      {
+        "name": "high_memory_usage",
+        "description": "Memory usage is high",
+        "query": "memory_usage > 80",
+        "duration": "5m",
+        "severity": "warning"
+      },
+      {
+        "name": "high_error_rate",
+        "description": "HTTP error rate is high",
+        "query": "http_errors_total / http_requests_total > 0.05",
+        "duration": "5m",
+        "severity": "critical"
+      },
+      {
+        "name": "slow_response_time",
+        "description": "HTTP response time is slow",
+        "query": "http_response_time_seconds > 2",
+        "duration": "5m",
+        "severity": "warning"
+      },
+      {
+        "name": "database_connection_errors",
+        "description": "Database connection errors",
+        "query": "database_connection_errors_total > 0",
+        "duration": "5m",
+        "severity": "critical"
+      }
+    ],
+    "notifications": {
+      "email": {
+        "enabled": false,
+        "recipients": ["admin@doctorhealthy1.com"]
+      },
+      "slack": {
+        "enabled": false,
+        "webhook": "${SLACK_WEBHOOK_URL}",
+        "channel": "#alerts"
+      }
+    }
+  },
+  "healthChecks": {
+    "enabled": true,
+    "endpoint": "/health",
+    "interval": 30,
+    "timeout": 10,
+    "checks": {
+      "database": true,
+      "redis": true,
+      "disk": true,
+      "memory": true
+    }
+  },
+  "dashboard": {
+    "enabled": false,
+    "endpoint": "/dashboard",
+    "auth": {
+      "enabled": true,
+      "username": "${DASHBOARD_USERNAME}",
+      "password": "${DASHBOARD_PASSWORD}"
+    }
+  }
+}

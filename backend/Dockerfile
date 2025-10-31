@@ -1,10 +1,8 @@
 # Multi-stage build for Go application
-
-# Build stage
 FROM golang:1.21-alpine AS builder
 
-# Install build dependencies
-RUN apk add --no-cache git ca-certificates tzdata
+# Install necessary packages
+RUN apk add --no-cache git ca-certificates tzdata sqlite
 
 # Set working directory
 WORKDIR /app
@@ -19,68 +17,38 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags='-w -s -extldflags "-static"' \
-    -a -installsuffix cgo \
-    -o main .
+RUN CGO_ENABLED=1 GOOS=linux go build -o nutrition-platform .
 
-# Production stage
-FROM alpine:latest AS production
+# Final stage
+FROM alpine:latest
 
 # Install runtime dependencies
-RUN apk --no-cache add ca-certificates tzdata wget
+RUN apk --no-cache add ca-certificates curl sqlite
 
-# Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+# Create app user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Set working directory
 WORKDIR /app
 
 # Copy binary from builder stage
-COPY --from=builder /app/main .
+COPY --from=builder /app/nutrition-platform .
 
-# Copy configuration files
-COPY --from=builder /app/data ./data
+# Copy migration files
 COPY --from=builder /app/migrations ./migrations
 
-# Create necessary directories
-RUN mkdir -p /app/uploads /app/backups /app/logs && \
-    chown -R appuser:appgroup /app
+# Create data directory for SQLite
+RUN mkdir -p /app/data && chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
 
-# Expose ports
-EXPOSE 8080 9090
+# Expose port
+EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 -O /dev/null http://localhost:8080/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
 
-# Run the application
-CMD ["./main"]
-
-# Development stage (for local development)
-FROM golang:1.21-alpine AS development
-
-# Install development tools
-RUN apk add --no-cache git ca-certificates tzdata curl
-
-# Install air for hot reloading
-RUN go install github.com/cosmtrek/air@latest
-
-# Set working directory
-WORKDIR /app
-
-# Copy go mod files
-COPY go.mod go.sum ./
-
-# Download dependencies
-RUN go mod download
-
-# Expose ports
-EXPOSE 8080 9090
-
-# Run with air for hot reloading
-CMD ["air", "-c", ".air.toml"]
+# Start the application
+CMD ["./nutrition-platform"]

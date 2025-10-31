@@ -1,0 +1,29 @@
+meta {
+  name: Generate Workout
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/workouts/generate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{api_key}}
+}
+
+body:json {
+  {
+    "age": 30,
+    "gender": "male",
+    "fitnessLevel": "intermediate",
+    "goals": ["strength", "endurance"],
+    "availableTime": 45,
+    "equipment": ["dumbbells", "barbell"],
+    "injuries": [],
+    "preferences": ["compound movements"],
+    "language": "en"
+  }
+}

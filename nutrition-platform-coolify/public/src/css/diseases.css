@@ -1,0 +1,617 @@
+/* Disease Management Page Styles */
+
+/* Main Container */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    direction: rtl;
+    text-align: right;
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Form Sections */
+.form-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.form-section h3 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-section h3 i {
+    color: #3498db;
+    font-size: 1.2rem;
+}
+
+/* Form Controls */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-control:invalid {
+    border-color: #e74c3c;
+}
+
+/* Select Styling */
+select.form-control {
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: left 12px center;
+    background-size: 12px;
+    padding-left: 35px;
+}
+
+/* Textarea Styling */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+/* Generate Button */
+.generate-btn {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 40px auto;
+    min-width: 200px;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+    background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+}
+
+.generate-btn:active {
+    transform: translateY(0);
+}
+
+.generate-btn i {
+    margin-left: 10px;
+}
+
+/* Results Section */
+#treatmentPlanResults {
+    margin-top: 40px;
+    display: none;
+}
+
+/* Treatment Plan Header */
+.treatment-plan-header {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(142, 68, 173, 0.2);
+}
+
+.treatment-plan-header h2 {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.treatment-plan-header i {
+    margin-left: 15px;
+    font-size: 1.8rem;
+}
+
+/* Client Summary */
+.client-summary {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.client-summary h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.client-summary h3 i {
+    color: #3498db;
+}
+
+.client-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.client-details li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f2f6;
+    font-size: 1rem;
+}
+
+.client-details li:last-child {
+    border-bottom: none;
+}
+
+.client-details strong {
+    color: #2c3e50;
+    margin-left: 10px;
+}
+
+/* Treatment Sections */
+.treatment-section,
+.nutrition-section,
+.lifestyle-section,
+.medications-section,
+.cooking-tips-section,
+.followup-section {
+    margin-bottom: 30px;
+}
+
+.treatment-section h3,
+.nutrition-section h3,
+.lifestyle-section h3,
+.medications-section h3,
+.cooking-tips-section h3,
+.followup-section h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 0;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+/* Treatment Cards */
+.treatment-card,
+.nutrition-card,
+.lifestyle-card,
+.medication-card,
+.cooking-tips-card,
+.followup-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.treatment-card:hover,
+.nutrition-card:hover,
+.lifestyle-card:hover,
+.medication-card:hover,
+.cooking-tips-card:hover,
+.followup-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+}
+
+.treatment-card h4,
+.nutrition-card h4,
+.lifestyle-card h4,
+.medication-card h4,
+.cooking-tips-card h4,
+.followup-card h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.treatment-card p,
+.nutrition-card p,
+.lifestyle-card p,
+.medication-card p,
+.cooking-tips-card p,
+.followup-card p {
+    color: #5a6c7d;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.treatment-card ul,
+.nutrition-card ul,
+.lifestyle-card ul,
+.medication-card ul,
+.cooking-tips-card ul,
+.followup-card ul {
+    margin: 0;
+    padding-right: 20px;
+}
+
+.treatment-card li,
+.nutrition-card li,
+.lifestyle-card li,
+.medication-card li,
+.cooking-tips-card li,
+.followup-card li {
+    color: #5a6c7d;
+    line-height: 1.6;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.treatment-card li::before,
+.nutrition-card li::before,
+.lifestyle-card li::before,
+.medication-card li::before,
+.cooking-tips-card li::before,
+.followup-card li::before {
+    content: '•';
+    color: #3498db;
+    font-weight: bold;
+    position: absolute;
+    right: -15px;
+}
+
+/* Priority and Importance Badges */
+.priority-badge,
+.importance-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-عالية,
+.importance-عالية {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.priority-متوسطة,
+.importance-متوسطة {
+    background-color: #f39c12;
+    color: white;
+}
+
+.priority-منخفضة,
+.importance-منخفضة {
+    background-color: #27ae60;
+    color: white;
+}
+
+/* Medication Note */
+.medication-note {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 15px;
+    color: #856404;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.medication-note i {
+    color: #f39c12;
+}
+
+/* Medical Disclaimer */
+.medical-disclaimer {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 40px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.2);
+}
+
+.medical-disclaimer h4 {
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.medical-disclaimer p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+/* Loading Modal */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 40px;
+    text-align: center;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Message Alerts */
+.message-alert {
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 15px;
+    }
+    
+    .page-header {
+        padding: 20px 15px;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .form-section {
+        padding: 20px;
+    }
+    
+    .treatment-plan-header {
+        padding: 20px;
+    }
+    
+    .treatment-plan-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .client-summary {
+        padding: 20px;
+    }
+    
+    .treatment-card,
+    .nutrition-card,
+    .lifestyle-card,
+    .medication-card,
+    .cooking-tips-card,
+    .followup-card {
+        padding: 20px;
+    }
+    
+    .priority-badge,
+    .importance-badge {
+        position: static;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .form-section h3 {
+        font-size: 1.2rem;
+    }
+    
+    .generate-btn {
+        width: 100%;
+        padding: 12px 30px;
+    }
+    
+    .treatment-plan-header h2 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .generate-btn,
+    .form-section {
+        display: none;
+    }
+    
+    .main-container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .treatment-card,
+    .nutrition-card,
+    .lifestyle-card,
+    .medication-card,
+    .cooking-tips-card,
+    .followup-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* Accessibility */
+.form-control:focus,
+.generate-btn:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Success/Error States */
+.form-control.is-valid {
+    border-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+/* Smooth Transitions */
+* {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Icon Colors */
+.fa-heartbeat { color: #e74c3c; }
+.fa-user-md { color: #3498db; }
+.fa-stethoscope { color: #27ae60; }
+.fa-apple-alt { color: #f39c12; }
+.fa-heart { color: #e91e63; }
+.fa-pills { color: #9b59b6; }
+.fa-utensils { color: #ff6b6b; }
+.fa-calendar-check { color: #00d2d3; }
+.fa-exclamation-triangle { color: #f39c12; }

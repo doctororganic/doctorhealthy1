@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet & Meals - Nutrition Platform</title>
+    <script src="jspdf.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f8fafc;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .container-fluid {
+            padding: 2rem;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .meal-plan-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .meal-item {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nutrition-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .pdf-export-btn {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 1rem;
+            }
+            
+            .header-section h1 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="btn btn-outline-light" onclick="toggleLanguage()">
+            <i class="fas fa-language"></i> <span id="langToggleText">العربية</span>
+        </button>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="main-card">
+            <div class="header-section">
+                <h1 id="pageTitle">Diet & Meals Planning</h1>
+                <p id="pageSubtitle">Generate personalized weekly meal plans with nutritional guidance</p>
+            </div>
+
+            <div class="content-section">
+                <!-- User Data Input Form -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <h3 id="userDataTitle">Personal Information</h3>
+                            <form id="userDataForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="age" class="form-label" id="ageLabel">Age</label>
+                                        <input type="number" class="form-control" id="age" min="18" max="100" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gender" class="form-label" id="genderLabel">Gender</label>
+                                        <select class="form-select" id="gender" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="weight" class="form-label" id="weightLabel">Weight (kg)</label>
+                                        <input type="number" class="form-control" id="weight" min="30" max="300" step="0.1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="height" class="form-label" id="heightLabel">Height (cm)</label>
+                                        <input type="number" class="form-control" id="height" min="120" max="250" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="activityLevel" class="form-label" id="activityLabel">Activity Level</label>
+                                        <select class="form-select" id="activityLevel" required>
+                                            <option value="">Select Activity Level</option>
+                                            <option value="sedentary">Sedentary</option>
+                                            <option value="lightly_active">Lightly Active</option>
+                                            <option value="moderately_active">Moderately Active</option>
+                                            <option value="very_active">Very Active</option>
+                                            <option value="extremely_active">Extremely Active</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="goal" class="form-label" id="goalLabel">Goal</label>
+                                        <select class="form-select" id="goal" required>
+                                            <option value="">Select Goal</option>
+                                            <option value="lose_weight">Lose Weight</option>
+                                            <option value="maintain_weight">Maintain Weight</option>
+                                            <option value="gain_weight">Gain Weight</option>
+                                            <option value="build_muscle">Build Muscle</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h3 id="preferencesTitle">Dietary Preferences</h3>
+                            <form id="preferencesForm">
+                                <div class="mb-3">
+                                    <label for="dietType" class="form-label" id="dietTypeLabel">Diet Type</label>
+                                    <select class="form-select" id="dietType" required>
+                                        <option value="">Select Diet Type</option>
+                                        <option value="standard">Standard</option>
+                                        <option value="mediterranean">Mediterranean</option>
+                                        <option value="keto">Ketogenic</option>
+                                        <option value="vegetarian">Vegetarian</option>
+                                        <option value="vegan">Vegan</option>
+                                        <option value="paleo">Paleo</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="allergies" class="form-label" id="allergiesLabel">Allergies & Restrictions</label>
+                                    <textarea class="form-control" id="allergies" rows="3" placeholder="List any food allergies or restrictions..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="preferences" class="form-label" id="likesLabel">Food Preferences</label>
+                                    <textarea class="form-control" id="preferences" rows="3" placeholder="Foods you enjoy..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dislikes" class="form-label" id="dislikesLabel">Food Dislikes</label>
+                                    <textarea class="form-control" id="dislikes" rows="3" placeholder="Foods to avoid..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center mb-4">
+                    <button class="btn btn-primary-custom btn-lg" onclick="generateMealPlan()">
+                        <i class="fas fa-magic"></i> <span id="generateBtn">Generate Weekly Meal Plan</span>
+                    </button>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2" id="loadingText">Generating your personalized meal plan...</p>
+                </div>
+
+                <!-- Meal Plan Results -->
+                <div id="mealPlanResults" style="display: none;">
+                    <!-- Nutritional Summary -->
+                    <div class="meal-plan-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 id="nutritionSummaryTitle">Nutritional Summary</h3>
+                            <button class="btn pdf-export-btn" onclick="exportToPDF()">
+                                <i class="fas fa-file-pdf"></i> <span id="exportPdfBtn">Export PDF</span>
+                            </button>
+                        </div>
+                        <div class="row" id="nutritionSummary">
+                            <!-- Nutrition data will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Weekly Meal Plan -->
+                    <div class="meal-plan-card">
+                        <h3 id="weeklyPlanTitle">Weekly Meal Plan</h3>
+                        <div id="weeklyMealPlan">
+                            <!-- Meal plan will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Research Links -->
+                    <div class="meal-plan-card">
+                        <h3 id="researchTitle">Scientific References</h3>
+                        <div id="researchLinks">
+                            <!-- Research links will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let currentLanguage = 'en';
+        let currentMealPlan = null;
+
+        // Language translations
+        const translations = {
+            en: {
+                pageTitle: "Diet & Meals Planning",
+                pageSubtitle: "Generate personalized weekly meal plans with nutritional guidance",
+                userDataTitle: "Personal Information",
+                ageLabel: "Age",
+                genderLabel: "Gender",
+                weightLabel: "Weight (kg)",
+                heightLabel: "Height (cm)",
+                activityLabel: "Activity Level",
+                goalLabel: "Goal",
+                preferencesTitle: "Dietary Preferences",
+                dietTypeLabel: "Diet Type",
+                allergiesLabel: "Allergies & Restrictions",
+                likesLabel: "Food Preferences",
+                dislikesLabel: "Food Dislikes",
+                generateBtn: "Generate Weekly Meal Plan",
+                loadingText: "Generating your personalized meal plan...",
+                nutritionSummaryTitle: "Nutritional Summary",
+                exportPdfBtn: "Export PDF",
+                weeklyPlanTitle: "Weekly Meal Plan",
+                researchTitle: "Scientific References",
+                langToggleText: "العربية"
+            },
+            ar: {
+                pageTitle: "تخطيط النظام الغذائي والوجبات",
+                pageSubtitle: "إنشاء خطط وجبات أسبوعية مخصصة مع إرشادات غذائية",
+                userDataTitle: "المعلومات الشخصية",
+                ageLabel: "العمر",
+                genderLabel: "الجنس",
+                weightLabel: "الوزن (كيلو)",
+                heightLabel: "الطول (سم)",
+                activityLabel: "مستوى النشاط",
+                goalLabel: "الهدف",
+                preferencesTitle: "التفضيلات الغذائية",
+                dietTypeLabel: "نوع النظام الغذائي",
+                allergiesLabel: "الحساسية والقيود",
+                likesLabel: "تفضيلات الطعام",
+                dislikesLabel: "الأطعمة المكروهة",
+                generateBtn: "إنشاء خطة وجبات أسبوعية",
+                loadingText: "جاري إنشاء خطة الوجبات المخصصة لك...",
+                nutritionSummaryTitle: "ملخص التغذية",
+                exportPdfBtn: "تصدير PDF",
+                weeklyPlanTitle: "خطة الوجبات الأسبوعية",
+                researchTitle: "المراجع العلمية",
+                langToggleText: "English"
+            }
+        };
+
+        // Toggle language function
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            updateLanguage();
+        }
+
+        // Update language function
+        function updateLanguage() {
+            const lang = translations[currentLanguage];
+            
+            // Update text content
+            Object.keys(lang).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = lang[key];
+                }
+            });
+
+            // Update document direction for Arabic
+            document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLanguage;
+        }
+
+        // Generate meal plan function
+        async function generateMealPlan() {
+            // Validate form data
+            const userData = {
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                weight: parseFloat(document.getElementById('weight').value),
+                height: parseFloat(document.getElementById('height').value),
+                activityLevel: document.getElementById('activityLevel').value,
+                goal: document.getElementById('goal').value,
+                dietType: document.getElementById('dietType').value,
+                allergies: document.getElementById('allergies').value,
+                preferences: document.getElementById('preferences').value,
+                dislikes: document.getElementById('dislikes').value,
+                language: currentLanguage
+            };
+
+            // Validate required fields
+            if (!userData.age || !userData.gender || !userData.weight || !userData.height || 
+                !userData.activityLevel || !userData.goal || !userData.dietType) {
+                alert(currentLanguage === 'en' ? 'Please fill in all required fields.' : 'يرجى ملء جميع الحقول المطلوبة.');
+                return;
+            }
+
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('mealPlanResults').style.display = 'none';
+
+            try {
+                // Call backend API
+                const response = await fetch('/api/generate-meal-plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate meal plan');
+                }
+
+                const mealPlan = await response.json();
+                currentMealPlan = mealPlan;
+                
+                // Display results
+                displayMealPlan(mealPlan);
+                
+            } catch (error) {
+                console.error('Error generating meal plan:', error);
+                alert(currentLanguage === 'en' ? 
+                    'Error generating meal plan. Please try again.' : 
+                    'خطأ في إنشاء خطة الوجبات. يرجى المحاولة مرة أخرى.');
+            } finally {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+
+        // Display meal plan function
+        function displayMealPlan(mealPlan) {
+            // Display nutritional summary
+            const nutritionSummary = document.getElementById('nutritionSummary');
+            nutritionSummary.innerHTML = `
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4 class="text-primary">${mealPlan.calories}</h4>
+                        <p class="mb-0">${currentLanguage === 'en' ? 'Calories' : 'سعرات حرارية'}</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4 class="text-success">${mealPlan.protein}g</h4>
+                        <p class="mb-0">${currentLanguage === 'en' ? 'Protein' : 'بروتين'}</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4 class="text-warning">${mealPlan.carbs}g</h4>
+                        <p class="mb-0">${currentLanguage === 'en' ? 'Carbs' : 'كربوهيدرات'}</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <h4 class="text-info">${mealPlan.fat}g</h4>
+                        <p class="mb-0">${currentLanguage === 'en' ? 'Fat' : 'دهون'}</p>
+                    </div>
+                </div>
+            `;
+
+            // Display weekly meal plan
+            const weeklyMealPlan = document.getElementById('weeklyMealPlan');
+            let mealPlanHTML = '';
+            
+            mealPlan.weeklyPlan.forEach((day, index) => {
+                const dayNames = currentLanguage === 'en' ? 
+                    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] :
+                    ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'];
+                
+                mealPlanHTML += `
+                    <div class="day-plan mb-4">
+                        <h4 class="text-primary mb-3">${dayNames[index]}</h4>
+                        <div class="row">
+                            ${day.meals.map(meal => `
+                                <div class="col-md-6 mb-3">
+                                    <div class="meal-item">
+                                        <h5>${meal.name[currentLanguage]}</h5>
+                                        <p class="text-muted mb-2">${meal.description[currentLanguage]}</p>
+                                        <div class="d-flex flex-wrap gap-2 mb-2">
+                                            <span class="nutrition-badge">${meal.calories} cal</span>
+                                            <span class="nutrition-badge">${meal.protein}g protein</span>
+                                        </div>
+                                        <div class="ingredients">
+                                            <strong>${currentLanguage === 'en' ? 'Ingredients:' : 'المكونات:'}</strong>
+                                            <ul class="mt-1">
+                                                ${meal.ingredients.map(ing => `<li>${ing[currentLanguage]}</li>`).join('')}
+                                            </ul>
+                                        </div>
+                                        <div class="preparation">
+                                            <strong>${currentLanguage === 'en' ? 'Preparation:' : 'التحضير:'}</strong>
+                                            <p class="mt-1">${meal.preparation[currentLanguage]}</p>
+                                        </div>
+                                        ${meal.alternative ? `
+                                            <div class="alternative">
+                                                <strong>${currentLanguage === 'en' ? 'Alternative:' : 'البديل:'}</strong>
+                                                <p class="mt-1">${meal.alternative[currentLanguage]}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            weeklyMealPlan.innerHTML = mealPlanHTML;
+
+            // Display research links
+            const researchLinks = document.getElementById('researchLinks');
+            researchLinks.innerHTML = mealPlan.researchLinks.map(link => `
+                <div class="mb-2">
+                    <a href="${link.url}" target="_blank" class="text-decoration-none">
+                        <i class="fas fa-external-link-alt"></i> ${link.title[currentLanguage]}
+                    </a>
+                </div>
+            `).join('');
+
+            // Show results
+            document.getElementById('mealPlanResults').style.display = 'block';
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const content = document.getElementById('meal-plan-content');
+            if (!content || content.innerHTML.trim() === '') {
+                alert(currentLang === 'ar' ? 'يرجى إنشاء خطة وجبات أولاً' : 'Please generate a meal plan first');
+                return;
+            }
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text(currentLang === 'ar' ? 'خطة الوجبات الأسبوعية' : 'Weekly Meal Plan', 20, 20);
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.text(`${currentLang === 'ar' ? 'التاريخ:' : 'Date:'} ${new Date().toLocaleDateString()}`, 20, 35);
+            
+            // Extract and format meal plan content
+            const mealPlanText = content.innerText;
+            const lines = mealPlanText.split('\n').filter(line => line.trim() !== '');
+            
+            let yPosition = 50;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 20;
+            
+            lines.forEach(line => {
+                if (yPosition > pageHeight - margin) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                
+                // Handle different text sizes for headers
+                if (line.includes('Day') || line.includes('يوم')) {
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                } else {
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                }
+                
+                // Split long lines
+                const splitText = doc.splitTextToSize(line, 170);
+                doc.text(splitText, 20, yPosition);
+                yPosition += splitText.length * 5 + 2;
+            });
+            
+            // Save the PDF
+            doc.save(`meal-plan-${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLanguage();
+        });
+    </script>
+</body>
+</html>

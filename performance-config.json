@@ -1,0 +1,96 @@
+{
+  "caching": {
+    "enabled": true,
+    "redis": {
+      "enabled": true,
+      "host": "${REDIS_HOST}",
+      "port": 6379,
+      "password": "${REDIS_PASSWORD}",
+      "db": 0,
+      "ttl": 3600
+    },
+    "browser": {
+      "enabled": true,
+      "maxAge": {
+        "static": 31536000,
+        "api": 300
+      }
+    }
+  },
+  "compression": {
+    "enabled": true,
+    "level": 6,
+    "threshold": 1024
+  },
+  "rateLimit": {
+    "enabled": true,
+    "requests": 100,
+    "window": 60,
+    "trustProxy": true
+  },
+  "security": {
+    "headers": {
+      "contentSecurityPolicy": {
+        "enabled": true,
+        "directives": {
+          "defaultSrc": ["'self'"],
+          "scriptSrc": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          "styleSrc": ["'self'", "'unsafe-inline'"],
+          "imgSrc": ["'self'", "data:", "https:"],
+          "fontSrc": ["'self'", "data:"],
+          "connectSrc": ["'self'"]
+        }
+      },
+      "xFrameOptions": "SAMEORIGIN",
+      "xContentTypeOptions": "nosniff",
+      "xXssProtection": "1; mode=block",
+      "referrerPolicy": "strict-origin-when-cross-origin"
+    },
+    "cors": {
+      "enabled": true,
+      "origin": ["https://doctorhealthy1.com", "https://nutrition-platform.fly.dev"],
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allowedHeaders": ["Content-Type", "Authorization"],
+      "exposedHeaders": ["Content-Length", "X-Request-Id"],
+      "credentials": true,
+      "maxAge": 86400
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "metrics": {
+      "enabled": true,
+      "path": "/metrics",
+      "interval": 15
+    },
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "requests": true,
+      "errors": true
+    },
+    "healthCheck": {
+      "enabled": true,
+      "path": "/health",
+      "interval": 30,
+      "timeout": 10
+    }
+  },
+  "optimization": {
+    "minify": {
+      "html": true,
+      "css": true,
+      "js": true
+    },
+    "images": {
+      "webp": true,
+      "quality": 80,
+      "maxSize": 200
+    },
+    "database": {
+      "poolSize": 25,
+      "idleTimeout": 300,
+      "connectionLifetime": 3600
+    }
+  }
+}

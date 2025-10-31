@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FEF9C7; /* pale yellow */
+  --accent-green: #10B981;
+  --accent-blue: #3B82F6;
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --border-color: #E5E7EB;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.feature-card {
+  @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FEF9C7 100%);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.feature-title {
+  @apply text-xl font-bold mb-4;
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md;
+}
+
+.nutrition-box {
+  @apply bg-white rounded-lg p-6 shadow-md border-l-4 border-green-500;
+}
+
+.workout-box {
+  @apply bg-white rounded-lg p-6 shadow-md border-l-4 border-blue-500;
+}
+
+.recipe-box {
+  @apply bg-white rounded-lg p-6 shadow-md border-l-4 border-green-500;
+}
+
+.disease-box {
+  @apply bg-white rounded-lg p-6 shadow-md border-l-4 border-blue-500;
+}
+
+.meal-card {
+  @apply bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer;
+}
+
+.meal-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.halal-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800;
+}
+
+.haram-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800;
+}
+
+.disclaimer {
+  @apply text-sm text-gray-600 italic border-t border-gray-200 pt-4 mt-4;
+}
+
+.calculator-result {
+  @apply bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 border border-green-200;
+}

@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Nutrition Platform API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    "package-lock.json"
+  ]
+}

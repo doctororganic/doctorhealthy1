@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifestyle Diseases - Nutrition Platform</title>
+    <script src="jspdf.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7c3aed;
+            --secondary-color: #a855f7;
+            --accent-color: #c084fc;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f8fafc;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .container-fluid {
+            padding: 2rem;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
+        }
+
+        .treatment-plan-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .disease-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .severity-low {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .severity-medium {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .severity-high {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .medication-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #bae6fd;
+        }
+
+        .supplement-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #bbf7d0;
+        }
+
+        .lifestyle-tip {
+            background: linear-gradient(135deg, #fefce8, #fef3c7);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #fde68a;
+        }
+
+        .nutrition-recommendation {
+            background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #f9a8d4;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .pdf-export-btn {
+            background: linear-gradient(135deg, #059669, #10b981);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+        }
+
+        .warning-alert {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .warning-alert .fas {
+            color: var(--danger-color);
+        }
+
+        .progress-tracker {
+            background: var(--bg-light);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 1rem;
+            }
+            
+            .header-section h1 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="language-toggle">
+        <button class="btn btn-outline-light" onclick="toggleLanguage()">
+            <i class="fas fa-language"></i> <span id="langToggleText">العربية</span>
+        </button>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="main-card">
+            <div class="header-section">
+                <h1 id="pageTitle">Lifestyle & Disease Management</h1>
+                <p id="pageSubtitle">Comprehensive health guidance, treatment plans, and lifestyle modifications</p>
+            </div>
+
+            <div class="content-section">
+                <!-- User Health Data Input Form -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <h3 id="healthDataTitle">Health Information</h3>
+                            <form id="healthDataForm">
+                                <div class="mb-3">
+                                    <label for="currentDiseases" class="form-label" id="currentDiseasesLabel">Current Health Conditions</label>
+                                    <select class="form-select" id="currentDiseases" multiple>
+                                        <option value="diabetes">Diabetes</option>
+                                        <option value="hypertension">Hypertension</option>
+                                        <option value="heart_disease">Heart Disease</option>
+                                        <option value="obesity">Obesity</option>
+                                        <option value="arthritis">Arthritis</option>
+                                        <option value="depression">Depression</option>
+                                        <option value="anxiety">Anxiety</option>
+                                        <option value="thyroid">Thyroid Disorders</option>
+                                        <option value="kidney_disease">Kidney Disease</option>
+                                        <option value="liver_disease">Liver Disease</option>
+                                        <option value="asthma">Asthma</option>
+                                        <option value="copd">COPD</option>
+                                    </select>
+                                    <small class="form-text text-muted" id="diseasesHelp">Hold Ctrl/Cmd to select multiple conditions</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="symptoms" class="form-label" id="symptomsLabel">Current Symptoms</label>
+                                    <textarea class="form-control" id="symptoms" rows="3" placeholder="Describe your current symptoms..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="familyHistory" class="form-label" id="familyHistoryLabel">Family Medical History</label>
+                                    <textarea class="form-control" id="familyHistory" rows="3" placeholder="List family history of diseases..."></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="smokingStatus" class="form-label" id="smokingStatusLabel">Smoking Status</label>
+                                        <select class="form-select" id="smokingStatus">
+                                            <option value="">Select Status</option>
+                                            <option value="never">Never Smoked</option>
+                                            <option value="former">Former Smoker</option>
+                                            <option value="current">Current Smoker</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="alcoholConsumption" class="form-label" id="alcoholConsumptionLabel">Alcohol Consumption</label>
+                                        <select class="form-select" id="alcoholConsumption">
+                                            <option value="">Select Frequency</option>
+                                            <option value="none">None</option>
+                                            <option value="occasional">Occasional</option>
+                                            <option value="moderate">Moderate</option>
+                                            <option value="heavy">Heavy</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <h3 id="medicationTitle">Medications & Lifestyle</h3>
+                            <form id="medicationForm">
+                                <div class="mb-3">
+                                    <label for="currentMedications" class="form-label" id="currentMedicationsLabel">Current Medications</label>
+                                    <textarea class="form-control" id="currentMedications" rows="3" placeholder="List all current medications with dosages..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="allergies" class="form-label" id="allergiesLabel">Allergies & Intolerances</label>
+                                    <textarea class="form-control" id="allergies" rows="2" placeholder="List any drug allergies or food intolerances..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sleepHours" class="form-label" id="sleepHoursLabel">Average Sleep Hours</label>
+                                    <select class="form-select" id="sleepHours">
+                                        <option value="">Select Hours</option>
+                                        <option value="4-5">4-5 hours</option>
+                                        <option value="6-7">6-7 hours</option>
+                                        <option value="7-8">7-8 hours</option>
+                                        <option value="8-9">8-9 hours</option>
+                                        <option value="9+">9+ hours</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="stressLevel" class="form-label" id="stressLevelLabel">Stress Level (1-10)</label>
+                                    <input type="range" class="form-range" id="stressLevel" min="1" max="10" value="5">
+                                    <div class="d-flex justify-content-between">
+                                        <small>Low</small>
+                                        <small id="stressValue">5</small>
+                                        <small>High</small>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="exerciseFrequency" class="form-label" id="exerciseFrequencyLabel">Exercise Frequency</label>
+                                    <select class="form-select" id="exerciseFrequency">
+                                        <option value="">Select Frequency</option>
+                                        <option value="none">No Exercise</option>
+                                        <option value="1-2">1-2 times per week</option>
+                                        <option value="3-4">3-4 times per week</option>
+                                        <option value="5-6">5-6 times per week</option>
+                                        <option value="daily">Daily</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="text-center mb-4">
+                    <button class="btn btn-primary-custom btn-lg" onclick="generateTreatmentPlan()">
+                        <i class="fas fa-magic"></i> <span id="generateBtn">Generate Treatment Plan</span>
+                    </button>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2" id="loadingText">Generating your personalized treatment plan...</p>
+                </div>
+
+                <!-- Treatment Plan Results -->
+                <div id="treatmentPlanResults" style="display: none;">
+                    <!-- Health Summary -->
+                    <div class="treatment-plan-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 id="healthSummaryTitle">Health Summary</h3>
+                            <button class="btn pdf-export-btn" onclick="exportToPDF()">
+                                <i class="fas fa-file-pdf"></i> <span id="exportPdfBtn">Export PDF</span>
+                            </button>
+                        </div>
+                        <div id="healthSummary">
+                            <!-- Health summary will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Treatment Plan -->
+                    <div class="treatment-plan-card">
+                        <h3 id="treatmentPlanTitle">Treatment Plan</h3>
+                        <div id="treatmentPlan">
+                            <!-- Treatment plan will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Nutrition Recommendations -->
+                    <div class="treatment-plan-card">
+                        <h3 id="nutritionRecommendationsTitle">Nutrition Recommendations</h3>
+                        <div id="nutritionRecommendations">
+                            <!-- Nutrition recommendations will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Lifestyle Modifications -->
+                    <div class="treatment-plan-card">
+                        <h3 id="lifestyleModificationsTitle">Lifestyle Modifications</h3>
+                        <div id="lifestyleModifications">
+                            <!-- Lifestyle modifications will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Supplements & Medications -->
+                    <div class="treatment-plan-card">
+                        <h3 id="supplementsMedicationsTitle">Supplements & Medication Guidance</h3>
+                        <div id="supplementsMedications">
+                            <!-- Supplements and medications will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Progress Tracking -->
+                    <div class="treatment-plan-card">
+                        <h3 id="progressTrackingTitle">Progress Tracking</h3>
+                        <div id="progressTracking">
+                            <!-- Progress tracking will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Research References -->
+                    <div class="treatment-plan-card">
+                        <h3 id="researchReferencesTitle">Scientific References</h3>
+                        <div id="researchReferences">
+                            <!-- Research references will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let currentLanguage = 'en';
+        let currentTreatmentPlan = null;
+
+        // Language translations
+        const translations = {
+            en: {
+                pageTitle: "Lifestyle & Disease Management",
+                pageSubtitle: "Comprehensive health guidance, treatment plans, and lifestyle modifications",
+                healthDataTitle: "Health Information",
+                currentDiseasesLabel: "Current Health Conditions",
+                diseasesHelp: "Hold Ctrl/Cmd to select multiple conditions",
+                symptomsLabel: "Current Symptoms",
+                familyHistoryLabel: "Family Medical History",
+                smokingStatusLabel: "Smoking Status",
+                alcoholConsumptionLabel: "Alcohol Consumption",
+                medicationTitle: "Medications & Lifestyle",
+                currentMedicationsLabel: "Current Medications",
+                allergiesLabel: "Allergies & Intolerances",
+                sleepHoursLabel: "Average Sleep Hours",
+                stressLevelLabel: "Stress Level (1-10)",
+                exerciseFrequencyLabel: "Exercise Frequency",
+                generateBtn: "Generate Treatment Plan",
+                loadingText: "Generating your personalized treatment plan...",
+                healthSummaryTitle: "Health Summary",
+                exportPdfBtn: "Export PDF",
+                treatmentPlanTitle: "Treatment Plan",
+                nutritionRecommendationsTitle: "Nutrition Recommendations",
+                lifestyleModificationsTitle: "Lifestyle Modifications",
+                supplementsMedicationsTitle: "Supplements & Medication Guidance",
+                progressTrackingTitle: "Progress Tracking",
+                researchReferencesTitle: "Scientific References",
+                langToggleText: "العربية"
+            },
+            ar: {
+                pageTitle: "إدارة نمط الحياة والأمراض",
+                pageSubtitle: "إرشادات صحية شاملة وخطط علاجية وتعديلات نمط الحياة",
+                healthDataTitle: "المعلومات الصحية",
+                currentDiseasesLabel: "الحالات الصحية الحالية",
+                diseasesHelp: "اضغط Ctrl/Cmd لاختيار حالات متعددة",
+                symptomsLabel: "الأعراض الحالية",
+                familyHistoryLabel: "التاريخ الطبي للعائلة",
+                smokingStatusLabel: "حالة التدخين",
+                alcoholConsumptionLabel: "استهلاك الكحول",
+                medicationTitle: "الأدوية ونمط الحياة",
+                currentMedicationsLabel: "الأدوية الحالية",
+                allergiesLabel: "الحساسية وعدم التحمل",
+                sleepHoursLabel: "متوسط ساعات النوم",
+                stressLevelLabel: "مستوى التوتر (1-10)",
+                exerciseFrequencyLabel: "تكرار التمارين",
+                generateBtn: "إنشاء خطة العلاج",
+                loadingText: "جاري إنشاء خطة العلاج المخصصة لك...",
+                healthSummaryTitle: "ملخص الصحة",
+                exportPdfBtn: "تصدير PDF",
+                treatmentPlanTitle: "خطة العلاج",
+                nutritionRecommendationsTitle: "توصيات التغذية",
+                lifestyleModificationsTitle: "تعديلات نمط الحياة",
+                supplementsMedicationsTitle: "إرشادات المكملات والأدوية",
+                progressTrackingTitle: "تتبع التقدم",
+                researchReferencesTitle: "المراجع العلمية",
+                langToggleText: "English"
+            }
+        };
+
+        // Toggle language function
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'ar' : 'en';
+            updateLanguage();
+        }
+
+        // Update language function
+        function updateLanguage() {
+            const lang = translations[currentLanguage];
+            
+            // Update text content
+            Object.keys(lang).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = lang[key];
+                }
+            });
+
+            // Update document direction for Arabic
+            document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLanguage;
+        }
+
+        // Update stress level display
+        document.getElementById('stressLevel').addEventListener('input', function() {
+            document.getElementById('stressValue').textContent = this.value;
+        });
+
+        // Generate treatment plan function
+        async function generateTreatmentPlan() {
+            // Collect form data
+            const healthData = {
+                currentDiseases: Array.from(document.getElementById('currentDiseases').selectedOptions).map(option => option.value),
+                symptoms: document.getElementById('symptoms').value,
+                familyHistory: document.getElementById('familyHistory').value,
+                smokingStatus: document.getElementById('smokingStatus').value,
+                alcoholConsumption: document.getElementById('alcoholConsumption').value,
+                currentMedications: document.getElementById('currentMedications').value,
+                allergies: document.getElementById('allergies').value,
+                sleepHours: document.getElementById('sleepHours').value,
+                stressLevel: document.getElementById('stressLevel').value,
+                exerciseFrequency: document.getElementById('exerciseFrequency').value,
+                language: currentLanguage
+            };
+
+            // Validate required fields
+            if (healthData.currentDiseases.length === 0 && !healthData.symptoms) {
+                alert(currentLanguage === 'en' ? 'Please select at least one health condition or describe your symptoms.' : 'يرجى اختيار حالة صحية واحدة على الأقل أو وصف الأعراض.');
+                return;
+            }
+
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('treatmentPlanResults').style.display = 'none';
+
+            try {
+                // Call backend API
+                const response = await fetch('/api/generate-treatment-plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(healthData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate treatment plan');
+                }
+
+                const treatmentPlan = await response.json();
+                currentTreatmentPlan = treatmentPlan;
+                
+                // Display results
+                displayTreatmentPlan(treatmentPlan);
+                
+            } catch (error) {
+                console.error('Error generating treatment plan:', error);
+                
+                // Generate mock data for demonstration
+                const mockTreatmentPlan = generateMockTreatmentPlan(healthData);
+                currentTreatmentPlan = mockTreatmentPlan;
+                displayTreatmentPlan(mockTreatmentPlan);
+            } finally {
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+
+        // Generate mock treatment plan for demonstration
+        function generateMockTreatmentPlan(healthData) {
+            return {
+                healthSummary: {
+                    conditions: healthData.currentDiseases,
+                    riskLevel: healthData.currentDiseases.length > 2 ? 'high' : healthData.currentDiseases.length > 0 ? 'medium' : 'low',
+                    overallHealth: currentLanguage === 'en' ? 'Requires attention and lifestyle modifications' : 'يتطلب اهتماماً وتعديلات في نمط الحياة'
+                },
+                treatmentPlan: [
+                    {
+                        condition: healthData.currentDiseases[0] || 'General Health',
+                        recommendations: [
+                            currentLanguage === 'en' ? 'Regular monitoring and check-ups' : 'المراقبة المنتظمة والفحوصات',
+                            currentLanguage === 'en' ? 'Medication adherence as prescribed' : 'الالتزام بالأدوية كما هو موصوف',
+                            currentLanguage === 'en' ? 'Lifestyle modifications' : 'تعديلات نمط الحياة'
+                        ]
+                    }
+                ],
+                nutritionRecommendations: [
+                    {
+                        category: currentLanguage === 'en' ? 'Foods to Include' : 'الأطعمة المفيدة',
+                        items: [
+                            currentLanguage === 'en' ? 'Leafy green vegetables' : 'الخضروات الورقية الخضراء',
+                            currentLanguage === 'en' ? 'Lean proteins' : 'البروتينات الخالية من الدهون',
+                            currentLanguage === 'en' ? 'Whole grains' : 'الحبوب الكاملة'
+                        ]
+                    },
+                    {
+                        category: currentLanguage === 'en' ? 'Foods to Avoid' : 'الأطعمة التي يجب تجنبها',
+                        items: [
+                            currentLanguage === 'en' ? 'Processed foods' : 'الأطعمة المصنعة',
+                            currentLanguage === 'en' ? 'Excessive sugar' : 'السكر المفرط',
+                            currentLanguage === 'en' ? 'Trans fats' : 'الدهون المتحولة'
+                        ]
+                    }
+                ],
+                lifestyleModifications: [
+                    {
+                        area: currentLanguage === 'en' ? 'Sleep Hygiene' : 'نظافة النوم',
+                        recommendations: [
+                            currentLanguage === 'en' ? 'Maintain regular sleep schedule' : 'حافظ على جدول نوم منتظم',
+                            currentLanguage === 'en' ? 'Create comfortable sleep environment' : 'أنشئ بيئة نوم مريحة'
+                        ]
+                    },
+                    {
+                        area: currentLanguage === 'en' ? 'Stress Management' : 'إدارة التوتر',
+                        recommendations: [
+                            currentLanguage === 'en' ? 'Practice meditation or mindfulness' : 'مارس التأمل أو اليقظة الذهنية',
+                            currentLanguage === 'en' ? 'Regular physical activity' : 'النشاط البدني المنتظم'
+                        ]
+                    }
+                ],
+                supplements: [
+                    {
+                        name: currentLanguage === 'en' ? 'Vitamin D3' : 'فيتامين د3',
+                        dosage: '1000-2000 IU daily',
+                        benefits: currentLanguage === 'en' ? 'Bone health, immune function' : 'صحة العظام، وظيفة المناعة',
+                        precautions: currentLanguage === 'en' ? 'Monitor blood levels' : 'راقب مستويات الدم'
+                    }
+                ],
+                progressTracking: [
+                    {
+                        metric: currentLanguage === 'en' ? 'Blood Pressure' : 'ضغط الدم',
+                        frequency: currentLanguage === 'en' ? 'Weekly' : 'أسبوعياً',
+                        target: '120/80 mmHg'
+                    }
+                ],
+                researchReferences: [
+                    {
+                        title: currentLanguage === 'en' ? 'Lifestyle Medicine Guidelines' : 'إرشادات طب نمط الحياة',
+                        url: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6125024/'
+                    }
+                ]
+            };
+        }
+
+        // Display treatment plan function
+        function displayTreatmentPlan(treatmentPlan) {
+            // Display health summary
+            const healthSummary = document.getElementById('healthSummary');
+            const riskBadgeClass = treatmentPlan.healthSummary.riskLevel === 'high' ? 'severity-high' : 
+                                  treatmentPlan.healthSummary.riskLevel === 'medium' ? 'severity-medium' : 'severity-low';
+            
+            healthSummary.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>${currentLanguage === 'en' ? 'Health Conditions' : 'الحالات الصحية'}</h5>
+                        <div class="mb-3">
+                            ${treatmentPlan.healthSummary.conditions.map(condition => 
+                                `<span class="disease-badge">${condition}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>${currentLanguage === 'en' ? 'Risk Assessment' : 'تقييم المخاطر'}</h5>
+                        <span class="severity-badge ${riskBadgeClass}">
+                            ${treatmentPlan.healthSummary.riskLevel.toUpperCase()} ${currentLanguage === 'en' ? 'RISK' : 'خطر'}
+                        </span>
+                        <p class="mt-2">${treatmentPlan.healthSummary.overallHealth}</p>
+                    </div>
+                </div>
+            `;
+
+            // Display treatment plan
+            const treatmentPlan_div = document.getElementById('treatmentPlan');
+            treatmentPlan_div.innerHTML = treatmentPlan.treatmentPlan.map(treatment => `
+                <div class="medication-card">
+                    <h5>${treatment.condition}</h5>
+                    <ul class="mb-0">
+                        ${treatment.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            // Display nutrition recommendations
+            const nutritionRecommendations = document.getElementById('nutritionRecommendations');
+            nutritionRecommendations.innerHTML = treatmentPlan.nutritionRecommendations.map(nutrition => `
+                <div class="nutrition-recommendation">
+                    <h5>${nutrition.category}</h5>
+                    <ul class="mb-0">
+                        ${nutrition.items.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            // Display lifestyle modifications
+            const lifestyleModifications = document.getElementById('lifestyleModifications');
+            lifestyleModifications.innerHTML = treatmentPlan.lifestyleModifications.map(lifestyle => `
+                <div class="lifestyle-tip">
+                    <h5>${lifestyle.area}</h5>
+                    <ul class="mb-0">
+                        ${lifestyle.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+
+            // Display supplements and medications
+            const supplementsMedications = document.getElementById('supplementsMedications');
+            supplementsMedications.innerHTML = treatmentPlan.supplements.map(supplement => `
+                <div class="supplement-card">
+                    <h5>${supplement.name}</h5>
+                    <p><strong>${currentLanguage === 'en' ? 'Dosage:' : 'الجرعة:'}</strong> ${supplement.dosage}</p>
+                    <p><strong>${currentLanguage === 'en' ? 'Benefits:' : 'الفوائد:'}</strong> ${supplement.benefits}</p>
+                    <div class="warning-alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>${currentLanguage === 'en' ? 'Precautions:' : 'احتياطات:'}</strong> ${supplement.precautions}
+                    </div>
+                </div>
+            `).join('');
+
+            // Display progress tracking
+            const progressTracking = document.getElementById('progressTracking');
+            progressTracking.innerHTML = treatmentPlan.progressTracking.map(progress => `
+                <div class="progress-tracker">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6>${progress.metric}</h6>
+                        <small>${progress.frequency}</small>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <small class="text-muted">${currentLanguage === 'en' ? 'Target:' : 'الهدف:'} ${progress.target}</small>
+                </div>
+            `).join('');
+
+            // Display research references
+            const researchReferences = document.getElementById('researchReferences');
+            researchReferences.innerHTML = treatmentPlan.researchReferences.map(reference => `
+                <div class="mb-2">
+                    <a href="${reference.url}" target="_blank" class="text-decoration-none">
+                        <i class="fas fa-external-link-alt"></i> ${reference.title}
+                    </a>
+                </div>
+            `).join('');
+
+            // Show results
+            document.getElementById('treatmentPlanResults').style.display = 'block';
+        }
+
+        // Export to PDF function
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const content = document.getElementById('disease-plan-content');
+            if (!content || content.innerHTML.trim() === '') {
+                alert(currentLang === 'ar' ? 'يرجى إنشاء خطة علاج أولاً' : 'Please generate a treatment plan first');
+                return;
+            }
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text(currentLang === 'ar' ? 'خطة إدارة الأمراض المزمنة' : 'Lifestyle Disease Management Plan', 20, 20);
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.text(`${currentLang === 'ar' ? 'التاريخ:' : 'Date:'} ${new Date().toLocaleDateString()}`, 20, 35);
+            
+            // Extract and format disease plan content
+            const diseasePlanText = content.innerText;
+            const lines = diseasePlanText.split('\n').filter(line => line.trim() !== '');
+            
+            let yPosition = 50;
+            const pageHeight = doc.internal.pageSize.height;
+            const margin = 20;
+            
+            lines.forEach(line => {
+                if (yPosition > pageHeight - margin) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                
+                // Handle different text sizes for headers
+                if (line.includes('Treatment') || line.includes('علاج') || line.includes('Nutrition') || line.includes('تغذية')) {
+                    doc.setFontSize(14);
+                    doc.setFont(undefined, 'bold');
+                } else {
+                    doc.setFontSize(10);
+                    doc.setFont(undefined, 'normal');
+                }
+                
+                // Split long lines
+                const splitText = doc.splitTextToSize(line, 170);
+                doc.text(splitText, 20, yPosition);
+                yPosition += splitText.length * 5 + 2;
+            });
+            
+            // Save the PDF
+            doc.save(`disease-management-plan-${new Date().toISOString().split('T')[0]}.pdf`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLanguage();
+        });
+    </script>
+</body>
+</html>

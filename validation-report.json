@@ -1,0 +1,194 @@
+{
+  "timestamp": "2025-09-16T16:56:48.256Z",
+  "version": "1.0.0",
+  "overall": {
+    "status": "fail",
+    "score": 60,
+    "passedChecks": 3,
+    "totalChecks": 5,
+    "processingTime": 427
+  },
+  "categories": {
+    "database": {
+      "status": "pass",
+      "details": {
+        "configFileExists": true,
+        "walModeConfigured": true,
+        "fts5Configured": true,
+        "connectionPooling": true,
+        "backupConfigured": true,
+        "databaseExists": false,
+        "actualMode": "Database not created yet"
+      },
+      "errors": [],
+      "warnings": []
+    },
+    "rtl": {
+      "status": "warning",
+      "details": {
+        "cssFiles": [
+          {
+            "file": "rtl.css",
+            "exists": false,
+            "path": "./frontend/src/styles/rtl.css"
+          },
+          {
+            "file": "arabic.css",
+            "exists": false,
+            "path": "./frontend/src/styles/arabic.css"
+          },
+          {
+            "file": "styles.css",
+            "exists": false,
+            "path": "./frontend/src/styles/styles.css"
+          }
+        ],
+        "jsFiles": [
+          {
+            "file": "rtl-validator.js",
+            "exists": true,
+            "path": "./frontend/src/utils/rtl-validator.js",
+            "hasRTLValidation": true,
+            "hasArabicHandling": true
+          },
+          {
+            "file": "i18n.js",
+            "exists": false,
+            "path": "./frontend/src/utils/i18n.js"
+          }
+        ],
+        "i18nDependencies": [
+          {
+            "name": "i18next",
+            "version": "^23.7.16"
+          },
+          {
+            "name": "i18next-browser-languagedetector",
+            "version": "^7.2.0"
+          },
+          {
+            "name": "i18next-http-backend",
+            "version": "^2.4.2"
+          }
+        ],
+        "localeFiles": [
+          "ar",
+          "en"
+        ],
+        "hasArabicLocale": true
+      },
+      "errors": [],
+      "warnings": [
+        "RTL files exist but may lack proper RTL CSS properties"
+      ]
+    },
+    "images": {
+      "status": "pass",
+      "details": {
+        "totalImages": 0,
+        "validImages": 0,
+        "oversizedImages": 0,
+        "passRate": "0%",
+        "oversizedList": [],
+        "unsupportedFormats": [],
+        "directories": [
+          {
+            "path": "./frontend/public/images",
+            "exists": false,
+            "imageCount": 0
+          },
+          {
+            "path": "./frontend/src/assets/images",
+            "exists": false,
+            "imageCount": 0
+          },
+          {
+            "path": "./docs/images",
+            "exists": false,
+            "imageCount": 0
+          }
+        ]
+      },
+      "errors": [],
+      "warnings": [
+        "No images found. Check the source directory configuration."
+      ]
+    },
+    "docker": {
+      "status": "fail",
+      "details": {
+        "dockerfileExists": true,
+        "hasMultiStage": false,
+        "hasOptimizedBase": true,
+        "hasDockerignore": true,
+        "hasHealthCheck": false,
+        "hasNonRootUser": true,
+        "images": [
+          {
+            "name": "khaledelbaahith/nutrition-platform-frontend:latest",
+            "sizeStr": "82.7MB",
+            "sizeBytes": 86717235.2
+          },
+          {
+            "name": "nutrition-platform-frontend:latest",
+            "sizeStr": "82.7MB",
+            "sizeBytes": 86717235.2
+          },
+          {
+            "name": "khaledelbaahith/nutrition-platform:latest",
+            "sizeStr": "877MB",
+            "sizeBytes": 919601152
+          },
+          {
+            "name": "nutrition-platform:latest",
+            "sizeStr": "877MB",
+            "sizeBytes": 919601152
+          },
+          {
+            "name": "nutrition-platform-backend:latest",
+            "sizeStr": "64.1MB",
+            "sizeBytes": 67213721.6
+          },
+          {
+            "name": "nutrition-platform-amd64:latest",
+            "sizeStr": "16.5MB",
+            "sizeBytes": 17301504
+          },
+          {
+            "name": "nutrition-frontend:latest",
+            "sizeStr": "82.5MB",
+            "sizeBytes": 86507520
+          }
+        ]
+      },
+      "errors": [
+        "2 Docker images exceed 400MB limit",
+        "khaledelbaahith/nutrition-platform:latest: 877MB",
+        "nutrition-platform:latest: 877MB"
+      ],
+      "warnings": [
+        "No HEALTHCHECK instruction found in Dockerfile"
+      ]
+    },
+    "security": {
+      "status": "pass",
+      "details": {
+        "gitignoreExists": true,
+        "missingGitignorePatterns": [],
+        "secretScanCompleted": true,
+        "secretsFound": [],
+        "httpsConfigured": true
+      },
+      "errors": [],
+      "warnings": []
+    }
+  },
+  "summary": {
+    "totalErrors": 3,
+    "totalWarnings": 3,
+    "recommendations": [
+      "Implement comprehensive RTL support with Arabic fonts and CSS",
+      "Optimize Docker image size using multi-stage builds and Alpine base images"
+    ]
+  }
+}

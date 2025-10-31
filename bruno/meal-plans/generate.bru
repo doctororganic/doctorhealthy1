@@ -1,0 +1,30 @@
+meta {
+  name: Generate Meal Plan
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/meal-plans/generate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{api_key}}
+}
+
+body:json {
+  {
+    "age": 30,
+    "gender": "male",
+    "height": 175,
+    "weight": 70,
+    "activityLevel": "moderate",
+    "goal": "maintain",
+    "dietaryRestrictions": ["none"],
+    "allergies": [],
+    "preferences": ["balanced"],
+    "healthConditions": []
+  }
+}

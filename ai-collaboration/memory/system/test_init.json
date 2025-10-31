@@ -1,0 +1,12 @@
+{
+  "type": "system_test",
+  "status": "completed",
+  "timestamp": 1760144609588,
+  "agentId": "system",
+  "result": {
+    "success": true,
+    "initialized": true,
+    "timestamp": 1760144609604
+  },
+  "completedAt": 1760144609604
+}

@@ -1,0 +1,115 @@
+# Fixed Dockerfile for complete web deployment
+# This builds both backend and frontend with proper nginx setup
+
+FROM golang:1.22-alpine AS backend-builder
+
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates tzdata build-base
+
+# Set working directory
+WORKDIR /app
+
+# Copy backend source
+COPY backend/go.mod backend/go.sum ./
+RUN go mod download
+
+COPY backend/ .
+
+# Build the Go application
+ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
+RUN CGO_ENABLED=1 GOOS=linux go build -ldflags='-w -s' -o main .
+
+# Production stage with nginx and backend
+FROM alpine:3.18
+
+# Install runtime dependencies including nginx
+RUN apk --no-cache add ca-certificates tzdata curl nginx
+
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# Set working directory
+WORKDIR /app
+
+# Copy backend binary and data
+COPY --from=backend-builder /app/main ./backend/
+COPY --from=backend-builder /app/data ./backend/data/
+
+# Copy frontend files
+COPY frontend/ ./frontend/
+
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/http.d/default.conf
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/uploads /app/logs /var/log/nginx /var/lib/nginx/tmp /run/nginx && \
+    chown -R appuser:appgroup /app && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /var/lib/nginx && \
+    chown -R nginx:nginx /run/nginx && \
+    chmod -R 755 /app/backend && \
+    chmod -R 755 /app/frontend
+
+# Create startup script
+COPY <<EOF /app/start.sh
+#!/bin/sh
+set -e
+
+# Function to handle process termination
+cleanup() {
+  echo "Caught signal, shutting down gracefully..."
+  kill -TERM \$NGINX_PID 2>/dev/null || true
+  kill -TERM \$BACKEND_PID 2>/dev/null || true
+  wait
+  echo "Shutdown complete"
+  exit 0
+}
+
+# Set up signal trapping
+trap cleanup INT TERM
+
+# Start nginx in background
+echo "Starting nginx..."
+nginx -g "daemon off;" &
+NGINX_PID=\$!
+
+# Start backend application
+echo "Starting backend application..."
+cd /app/backend
+./main &
+BACKEND_PID=\$!
+
+# Wait for services to start
+sleep 3
+
+# Verify services are running
+if ! kill -0 \$NGINX_PID 2>/dev/null; then
+  echo "ERROR: Nginx failed to start"
+  exit 1
+fi
+
+if ! kill -0 \$BACKEND_PID 2>/dev/null; then
+  echo "ERROR: Backend failed to start"
+  exit 1
+fi
+
+echo "All services started successfully"
+echo "Frontend available at: http://localhost:80"
+echo "Backend API available at: http://localhost:8080"
+
+# Wait for any process to exit
+wait \$NGINX_PID \$BACKEND_PID
+EOF
+
+RUN chmod +x /app/start.sh
+
+# Expose ports
+EXPOSE 80 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:80/ && curl -f http://localhost:8080/health || exit 1
+
+# Start both services
+CMD ["/app/start.sh"]

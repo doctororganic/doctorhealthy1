@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "nutrition-platform",
   "builds": [
     {
       "src": "frontend/public/**",
@@ -71,10 +70,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "frontend/src/*.js": {
-      "maxDuration": 10
-    }
-  }
+  ]
 }

@@ -1,0 +1,19 @@
+{
+  "type": "frontend_development",
+  "description": "Create modern React.js interface for nutrition platform",
+  "deliverables": [
+    "Main dashboard component",
+    "Nutrition analyzer interface",
+    "Real-time metrics display",
+    "Mobile-responsive layout"
+  ],
+  "priority": "high",
+  "estimatedHours": 16,
+  "assignedTo": "kilo",
+  "assignedBy": "workflow_coordinator",
+  "assignmentTime": 1760148197659,
+  "agentRole": "frontend_development",
+  "status": "active",
+  "timestamp": 1760148197659,
+  "agentId": "kilo"
+}

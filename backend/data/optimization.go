@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,32 +26,32 @@ type DataOptimizer struct {
 
 // CacheConfig holds Redis caching configuration
 type CacheConfig struct {
-	DefaultTTL      time.Duration
-	MaxKeySize      int
-	MaxValueSize    int
+	DefaultTTL         time.Duration
+	MaxKeySize         int
+	MaxValueSize       int
 	CompressionEnabled bool
-	PrefixNamespace string
-	ClusterMode     bool
+	PrefixNamespace    string
+	ClusterMode        bool
 }
 
 // OptimizationMetrics tracks data optimization metrics
 type OptimizationMetrics struct {
-	CacheHits        int64
-	CacheMisses      int64
-	ValidationErrors int64
+	CacheHits          int64
+	CacheMisses        int64
+	ValidationErrors   int64
 	QueryOptimizations int64
 	PaginationRequests int64
-	mu               sync.RWMutex
+	mu                 sync.RWMutex
 }
 
 // PaginationConfig defines pagination parameters
 type PaginationConfig struct {
-	Page     int    `json:"page"`
-	Limit    int    `json:"limit"`
-	SortBy   string `json:"sort_by"`
-	SortDir  string `json:"sort_dir"`
-	Filters  map[string]interface{} `json:"filters"`
-	Search   string `json:"search"`
+	Page    int                    `json:"page"`
+	Limit   int                    `json:"limit"`
+	SortBy  string                 `json:"sort_by"`
+	SortDir string                 `json:"sort_dir"`
+	Filters map[string]interface{} `json:"filters"`
+	Search  string                 `json:"search"`
 }
 
 // PaginationResult contains paginated results
@@ -74,13 +73,13 @@ type ValidationResult struct {
 
 // QueryOptimization contains query optimization settings
 type QueryOptimization struct {
-	EagerLoading    []string          `json:"eager_loading"`
-	SelectFields    []string          `json:"select_fields"`
-	IndexHints      []string          `json:"index_hints"`
-	JoinStrategy    string            `json:"join_strategy"`
-	CacheStrategy   string            `json:"cache_strategy"`
-	BatchSize       int               `json:"batch_size"`
-	CustomFilters   map[string]interface{} `json:"custom_filters"`
+	EagerLoading  []string               `json:"eager_loading"`
+	SelectFields  []string               `json:"select_fields"`
+	IndexHints    []string               `json:"index_hints"`
+	JoinStrategy  string                 `json:"join_strategy"`
+	CacheStrategy string                 `json:"cache_strategy"`
+	BatchSize     int                    `json:"batch_size"`
+	CustomFilters map[string]interface{} `json:"custom_filters"`
 }
 
 // NewDataOptimizer creates a new data optimizer

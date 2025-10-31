@@ -1,0 +1,25 @@
+meta {
+  name: Analyze Nutrition
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/nutrition/analyze
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{api_key}}
+}
+
+body:json {
+  {
+    "food": "chicken breast",
+    "quantity": 150,
+    "unit": "g",
+    "checkHalal": true,
+    "language": "en"
+  }
+}
