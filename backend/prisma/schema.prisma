@@ -1,0 +1,376 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  firstName String?
+  lastName  String?
+  password  String
+  avatar    String?
+  phone     String?
+  dateOfBirth DateTime?
+  gender    Gender?
+  height    Float?   // in cm
+  weight    Float?   // in kg
+  activityLevel ActivityLevel?
+  goalType  GoalType?
+  targetWeight Float? // in kg
+  weeklyGoal Float?   // in kg per week
+  preferredUnits String @default("metric") // metric or imperial
+  language  String   @default("en")
+  timezone  String   @default("UTC")
+  isActive  Boolean  @default(true)
+  isVerified Boolean @default(false)
+  emailVerificationToken String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  lastLoginAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile UserProfile?
+  goals NutritionGoal[]
+  meals Meal[]
+  foodLogs FoodLog[]
+  progressRecords ProgressRecord[]
+  bodyMeasurements BodyMeasurement[]
+  customFoods CustomFood[]
+  waterIntakes WaterIntake[]
+  userDevices UserDevice[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String?
+  location    String?
+  occupation  String?
+  interests   String[]
+  preferences Json?    // User preferences as JSON
+  socialLinks Json?    // Social media links
+  privacy     Json?    // Privacy settings
+  notifications Json?  // Notification preferences
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model NutritionGoal {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  goalType    GoalType
+  targetCalories Int?
+  targetProtein  Float? // in grams
+  targetCarbs    Float? // in grams
+  targetFat      Float? // in grams
+  targetFiber    Float? // in grams
+  targetWater    Float? // in ml
+  activityLevel ActivityLevel
+  startDate    DateTime
+  targetDate   DateTime?
+  isActive     Boolean  @default(true)
+  isCompleted  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("nutrition_goals")
+}
+
+model Meal {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  mealType    MealType
+  description String?
+  calories    Int      @default(0)
+  protein     Float    @default(0)
+  carbs       Float    @default(0)
+  fat         Float    @default(0)
+  fiber       Float    @default(0)
+  sugar       Float    @default(0)
+  sodium      Float    @default(0)
+  cholesterol Float    @default(0)
+  mealDate    DateTime
+  isCompleted Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  foodLogs FoodLog[]
+
+  @@map("meals")
+}
+
+model Food {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  brand       String?
+  barcode     String?  @unique
+  category    String?
+  isHalal     Boolean  @default(false)
+  isVegetarian Boolean @default(false)
+  isVegan     Boolean  @default(false)
+  isGlutenFree Boolean @default(false)
+  isDairyFree Boolean  @default(false)
+  isOrganic   Boolean  @default(false)
+  servingSize Float    // in grams
+  servingUnit String   @default("g")
+  calories    Int      @default(0)
+  protein     Float    @default(0)
+  carbs       Float    @default(0)
+  fat         Float    @default(0)
+  fiber       Float    @default(0)
+  sugar       Float    @default(0)
+  sodium      Float    @default(0)
+  cholesterol Float    @default(0)
+  vitamins    Json?    // Vitamin information as JSON
+  minerals    Json?    // Mineral information as JSON
+  allergens   String[] // List of allergens
+  ingredients String[] // List of ingredients
+  tags        String[] // Search tags
+  imageUrl    String?
+  verified    Boolean  @default(false)
+  source      String?  // Data source (USDA, user, etc.)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  foodLogs FoodLog[]
+  customFoods CustomFood[]
+
+  @@map("foods")
+}
+
+model FoodLog {
+  id          String   @id @default(cuid())
+  userId      String
+  foodId      String?
+  mealId      String
+  quantity    Float    // in grams
+  servingSize Float    // in grams
+  servingUnit String   @default("g")
+  calories    Int      @default(0)
+  protein     Float    @default(0)
+  carbs       Float    @default(0)
+  fat         Float    @default(0)
+  fiber       Float    @default(0)
+  sugar       Float    @default(0)
+  sodium      Float    @default(0)
+  cholesterol Float    @default(0)
+  logDate     DateTime
+  notes       String?
+  isCustom    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  food Food? @relation(fields: [foodId], references: [id], onDelete: SetNull)
+
+  @@map("food_logs")
+}
+
+model CustomFood {
+  id          String   @id @default(cuid())
+  userId      String
+  foodId      String?
+  name        String
+  description String?
+  brand       String?
+  category    String?
+  isHalal     Boolean  @default(false)
+  isVegetarian Boolean @default(false)
+  isVegan     Boolean  @default(false)
+  isGlutenFree Boolean @default(false)
+  isDairyFree Boolean  @default(false)
+  isOrganic   Boolean  @default(false)
+  servingSize Float    // in grams
+  servingUnit String   @default("g")
+  calories    Int      @default(0)
+  protein     Float    @default(0)
+  carbs       Float    @default(0)
+  fat         Float    @default(0)
+  fiber       Float    @default(0)
+  sugar       Float    @default(0)
+  sodium      Float    @default(0)
+  cholesterol Float    @default(0)
+  vitamins    Json?    // Vitamin information as JSON
+  minerals    Json?    // Mineral information as JSON
+  allergens   String[] // List of allergens
+  ingredients String[] // List of ingredients
+  tags        String[] // Search tags
+  imageUrl    String?
+  isPublic    Boolean  @default(false)
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  food Food? @relation(fields: [foodId], references: [id], onDelete: SetNull)
+
+  @@map("custom_foods")
+}
+
+model ProgressRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  weight    Float?   // in kg
+  bodyFat   Float?   // percentage
+  muscle    Float?   // in kg
+  water     Float?   // percentage
+  bone      Float?   // in kg
+  metabolicAge Int?
+  visceralFat  Int?
+  bmi       Float?   // Body Mass Index
+  bmr       Int?     // Basal Metabolic Rate
+  tdee      Int?     // Total Daily Energy Expenditure
+  notes     String?
+  photos    String[] // Array of photo URLs
+  recordDate DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("progress_records")
+}
+
+model BodyMeasurement {
+  id            String   @id @default(cuid())
+  userId        String
+  chest         Float?   // in cm
+  waist         Float?   // in cm
+  hips          Float?   // in cm
+  arms          Float?   // in cm
+  thighs        Float?   // in cm
+  calves        Float?   // in cm
+  neck          Float?   // in cm
+  shoulders     Float?   // in cm
+  forearms      Float?   // in cm
+  wrist         Float?   // in cm
+  bodyFatCaliper Float?  // percentage
+  notes         String?
+  measurementDate DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("body_measurements")
+}
+
+model WaterIntake {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float    // in ml
+  unit      String   @default("ml")
+  intakeTime DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("water_intakes")
+}
+
+model UserDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  deviceType  String   // e.g., "fitbit", "apple_watch", "smart_scale"
+  deviceId    String   // Unique device identifier
+  deviceName  String?
+  isActive    Boolean  @default(true)
+  lastSyncAt  DateTime?
+  accessToken String?  // OAuth token for device API
+  refreshToken String? // OAuth refresh token
+  settings    Json?    // Device-specific settings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_devices")
+}
+
+// Enums
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum ActivityLevel {
+  SEDENTARY      // Little or no exercise
+  LIGHTLY_ACTIVE // Light exercise 1-3 days/week
+  MODERATELY_ACTIVE // Moderate exercise 3-5 days/week
+  VERY_ACTIVE    // Hard exercise 6-7 days/week
+  EXTRA_ACTIVE   // Very hard exercise, physical job
+}
+
+enum GoalType {
+  LOSE_WEIGHT
+  MAINTAIN_WEIGHT
+  GAIN_WEIGHT
+  BUILD_MUSCLE
+  IMPROVE_HEALTH
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+  MORNING_SNACK
+  AFTERNOON_SNACK
+  EVENING_SNACK
+  PRE_WORKOUT
+  POST_WORKOUT
+}
