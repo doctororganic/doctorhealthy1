@@ -1,0 +1,57 @@
+
+CLEANUP REPORT - Sat Nov  1 07:32:17 EET 2025
+================================
+ 97M	./nutrition-platform-coolify-20251013-144405.zip
+ 59M	./coolify-nutrition-platform-complete.zip
+ 58M	./nutrition-platform-deploy-20251006-172820.tar.gz
+285M	./nutrition-platform-deploy.tar.gz
+ 15M	./nutrition-platform.tar
+ 97M	./nutrition-platform-coolify-20251013-164858.zip
+ 98M	./nutrition-platform-coolify-20251013-160130.zip
+Archived: DEPLOY-NOW-GUIDE.md
+Archived: DEPLOY-NOW-INSTRUCTIONS.md
+Archived: DEPLOYMENT-GUIDE.md
+Archived: DEPLOYMENT-INSTRUCTIONS.md
+Archived: DEPLOYMENT-SUCCESS-SUMMARY.md
+Archived: DEPLOYMENT.md
+Archived: MANUAL_DEPLOYMENT.md
+Archived: MANUAL-DEPLOYMENT-STEPS.md
+Archived: MANUAL-COOLIFY-DEPLOYMENT-GUIDE.md
+Archived: coolify-deployment-guide.md
+Archived: coolify-manual-final-steps.md
+Archived: coolify-step-by-step.md
+Archived: deployment-summary.md
+Archived: manual-fix-instructions.md
+Archived: ssh-commands.md
+Archived: ERRORS-FIXED-SUMMARY.md
+Archived: ERROR-MANAGEMENT-REVIEW.md
+Archived: CRITICAL-REVIEW-VERIFICATION.md
+Archived: CRITICAL-BUGS-FIXED.md
+Archived: TEST-FIXES-COMPLETE.md
+Archived: KILLER-BUGS-ANALYSIS.md
+Archived: deploy-simple.sh
+Archived: deploy.sh
+Archived: DEPLOY-SECURE.sh
+Archived: DEPLOY-TO-COOLIFY.sh
+Archived: deploy-with-coolify.sh
+Archived: deploy-to-server.sh
+Archived: DEPLOY_NOW_FIX.sh
+Archived: DIAGNOSE-ALL-ISSUES.sh
+Archived: FIX-ALL-ERRORS.sh
+Archived: FIX-ERRORS-AUTO.sh
+Archived: AUTO-FIX-ERRORS.sh
+Archived: MONITOR-LIVE.sh
+Archived: MONITOR-LIVE-ERRORS.sh
+Archived: STRESS-TEST.sh
+Archived: STRESS-TEST-LIVE.sh
+Archived: LIVE-TEST-AND-DEPLOY.sh
+Archived: LIVE-TEST-DEPLOY.sh
+Archived: LIVE-DEPLOY-WITH-MONITORING.sh
+Archived: LIVE-TEST-AND-FIX.sh
+Archived: CONSOLIDATE-NOW.sh
+Archived: START-NOW.sh
+Archived: VERIFY-ENTERPRISE-STANDARDS.sh
+Archived: TEST-EVERYTHING.sh
+Archived: EXECUTE-IMPLEMENTATION.sh
+Archived: coolify-deployment-20251013-144403
+Archived: nutrition-platform-coolify

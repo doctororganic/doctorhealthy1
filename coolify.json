@@ -1,0 +1,38 @@
+{
+  "project": {
+    "name": "nutrition-platform",
+    "description": "AI-powered nutrition and health management platform"
+  },
+  "services": {
+    "backend": {
+      "type": "application",
+      "build_pack": "dockerfile",
+      "dockerfile_location": "backend/Dockerfile.secure",
+      "ports_exposes": "8080",
+      "health_check_enabled": true,
+      "health_check_path": "/health",
+      "health_check_port": "8080",
+      "health_check_interval": 30,
+      "health_check_timeout": 10,
+      "health_check_retries": 3,
+      "domains": ["api.super.doctorhealthy1.com"]
+    },
+    "frontend": {
+      "type": "application",
+      "build_pack": "dockerfile",
+      "dockerfile_location": "frontend-nextjs/Dockerfile.secure",
+      "ports_exposes": "3000",
+      "domains": ["super.doctorhealthy1.com"]
+    },
+    "postgres": {
+      "type": "database",
+      "image": "postgres:15-alpine",
+      "ports_exposes": "5432"
+    },
+    "redis": {
+      "type": "database",
+      "image": "redis:7-alpine",
+      "ports_exposes": "6379"
+    }
+  }
+}

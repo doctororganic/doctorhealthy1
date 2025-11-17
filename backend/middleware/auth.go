@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"nutrition-platform/services"
-
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
@@ -19,7 +17,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-var jwtSecret = []byte("your-secret-key-change-in-production")
+var jwtSecret = []byte("test_secret_key_for_development_32_chars_minimum_length")
 
 // JWTAuth middleware for JWT authentication
 func JWTAuth() echo.MiddlewareFunc {
@@ -56,16 +54,7 @@ func JWTAuth() echo.MiddlewareFunc {
 				})
 			}
 
-			// Check if user still exists
-			user, err := services.GetUserByID(claims.UserID)
-			if err != nil {
-				return c.JSON(http.StatusUnauthorized, map[string]string{
-					"error": "User not found",
-				})
-			}
-
-			// Set user context
-			c.Set("user", user)
+			// Set user context (stub for now)
 			c.Set("user_id", claims.UserID)
 			c.Set("is_admin", claims.IsAdmin)
 

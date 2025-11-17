@@ -8,6 +8,109 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// NutritionRequest represents a nutrition analysis request
+type NutritionRequest struct {
+	Food     string  `json:"food"`
+	Quantity float64 `json:"quantity"`
+	Unit     string  `json:"unit"`
+	MealType string  `json:"meal_type"`
+}
+
+// NutritionResponse represents nutrition analysis response
+type NutritionResponse struct {
+	Food            string             `json:"food"`
+	Quantity        float64            `json:"quantity"`
+	Unit            string             `json:"unit"`
+	Calories        float64            `json:"calories"`
+	Protein         float64            `json:"protein"`
+	Carbs           float64            `json:"carbs"`
+	Fat             float64            `json:"fat"`
+	Fiber           float64            `json:"fiber"`
+	Sugar           float64            `json:"sugar"`
+	Sodium          float64            `json:"sodium"`
+	Vitamins        map[string]float64 `json:"vitamins"`
+	Minerals        map[string]float64 `json:"minerals"`
+	HealthScore     int                `json:"health_score"`
+	Recommendations []string           `json:"recommendations"`
+}
+
+// MealPlanRequest represents a meal plan generation request
+type MealPlanRequest struct {
+	Goals               []string `json:"goals"`
+	DietaryRestrictions []string `json:"dietary_restrictions"`
+	CaloriesTarget      float64  `json:"calories_target"`
+	MealsPerDay         int      `json:"meals_per_day"`
+	Duration            int      `json:"duration_days"`
+}
+
+// generateNutritionAnalysis generates nutrition analysis for a food item
+func generateNutritionAnalysis(req NutritionRequest) NutritionResponse {
+	// This is a placeholder implementation
+	// In a real application, you would:
+	// 1. Look up the food in a nutrition database
+	// 2. Calculate nutrition based on quantity
+	// 3. Apply any relevant multipliers
+	return NutritionResponse{
+		Food:            req.Food,
+		Quantity:        req.Quantity,
+		Unit:            req.Unit,
+		Calories:        250.0,
+		Protein:         25.0,
+		Carbs:           30.0,
+		Fat:             10.0,
+		Fiber:           5.0,
+		Sugar:           8.0,
+		Sodium:          300.0,
+		Vitamins:        map[string]float64{"A": 1000, "C": 50, "D": 200},
+		Minerals:        map[string]float64{"Iron": 8, "Calcium": 200},
+		HealthScore:     85,
+		Recommendations: []string{"Good source of protein", "Consider adding more vegetables"},
+	}
+}
+
+// generateMealPlan generates a meal plan based on request
+func generateMealPlan(c echo.Context) error {
+	// This is a placeholder implementation
+	// In a real application, you would:
+	// 1. Analyze the user's requirements
+	// 2. Generate appropriate meals
+	// 3. Ensure nutritional balance
+	// 4. Consider dietary restrictions
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"meal_plan": map[string]interface{}{
+			"id":             "new-meal-plan-id",
+			"name":           "Balanced Nutrition Plan",
+			"description":    "A balanced meal plan for general health",
+			"duration":       7,
+			"meals_per_day":  3,
+			"total_calories": 2100,
+			"meals": []interface{}{
+				map[string]interface{}{
+					"day": 1,
+					"meals": []interface{}{
+						map[string]interface{}{
+							"name":     "Breakfast",
+							"calories": 700,
+							"foods":    []string{"Oatmeal", "Banana", "Almonds"},
+						},
+						map[string]interface{}{
+							"name":     "Lunch",
+							"calories": 700,
+							"foods":    []string{"Grilled Chicken", "Brown Rice", "Vegetables"},
+						},
+						map[string]interface{}{
+							"name":     "Dinner",
+							"calories": 700,
+							"foods":    []string{"Salmon", "Quinoa", "Salad"},
+						},
+					},
+				},
+			},
+		},
+		"generated_at": "now",
+	})
+}
+
 func SetupFrontendRoutes(e *echo.Echo, config Config) {
 	// Serve static files (CSS, JS, images, etc.)
 	e.Static("/assets", "./frontend/build/static")  // React build static files

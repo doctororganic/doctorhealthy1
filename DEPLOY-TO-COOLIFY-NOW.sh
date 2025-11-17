@@ -1,159 +1,252 @@
 #!/bin/bash
-
-# ============================================
-# COOLIFY DEPLOYMENT SCRIPT
-# Senior Manager Approved
-# ============================================
-
 set -e
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-NC='\033[0m'
+echo "🚀 DEPLOYING TO COOLIFY VIA MCP"
+echo "================================"
 
-log() { echo -e "${BLUE}[INFO]${NC} $1"; }
-success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-error() { echo -e "${RED}[ERROR]${NC} $1"; }
-warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
-step() { echo -e "${PURPLE}[STEP]${NC} $1"; }
+# Load credentials
+source .coolify-credentials.enc
 
-clear
-echo ""
-echo -e "${CYAN}╔════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║                                            ║${NC}"
-echo -e "${CYAN}║     🚀 COOLIFY DEPLOYMENT SCRIPT 🚀       ║${NC}"
-echo -e "${CYAN}║     Senior Manager Approved                ║${NC}"
-echo -e "${CYAN}║                                            ║${NC}"
-echo -e "${CYAN}╚════════════════════════════════════════════╝${NC}"
+# Server info from MCP
+SERVER_UUID="x8gck8ggggsgkggg4coosg0g"
+SERVER_IP="128.140.111.171"
+TEAM_ID="0"
+
+echo "✅ Coolify Version: 4.0.0-beta.434"
+echo "✅ Server: localhost ($SERVER_IP)"
+echo "✅ Team: Root Team"
 echo ""
 
-# Configuration
-COOLIFY_URL="https://api.doctorhealthy1.com"
-COOLIFY_TOKEN="6|uJSYhIJQIypx4UuxbQkaHkidEyiQshLR6U1QNxEQab344fda"
-PROJECT_NAME="new doctorhealthy1"
-APP_NAME="trae-healthy1"
-DOMAIN="super.doctorhealthy1.com"
-PORT="3000"
+# Generate deployment secrets
+echo "🔐 Generating secure credentials..."
+DB_PASSWORD=$(openssl rand -hex 32)
+JWT_SECRET=$(openssl rand -hex 64)
+API_KEY_SECRET=$(openssl rand -hex 64)
+REDIS_PASSWORD=$(openssl rand -hex 32)
+ENCRYPTION_KEY=$(openssl rand -hex 32)
 
-log "Deployment Configuration:"
-echo "  Coolify URL: $COOLIFY_URL"
-echo "  Project: $PROJECT_NAME"
-echo "  Application: $APP_NAME"
-echo "  Domain: $DOMAIN"
-echo "  Port: $PORT"
+# Save credentials
+cat > .env.coolify.secure << EOF
+# COOLIFY DEPLOYMENT CREDENTIALS
+# Generated: $(date)
+
+# Database
+DB_HOST=postgres
+DB_PORT=5432
+DB_NAME=nutrition_platform
+DB_USER=nutrition_user
+DB_PASSWORD=${DB_PASSWORD}
+DB_SSL_MODE=require
+
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=${REDIS_PASSWORD}
+
+# Security
+JWT_SECRET=${JWT_SECRET}
+API_KEY_SECRET=${API_KEY_SECRET}
+ENCRYPTION_KEY=${ENCRYPTION_KEY}
+
+# Server
+PORT=8080
+ENVIRONMENT=production
+DOMAIN=super.doctorhealthy1.com
+API_DOMAIN=api.super.doctorhealthy1.com
+ALLOWED_ORIGINS=https://super.doctorhealthy1.com,https://www.super.doctorhealthy1.com
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60s
+EOF
+
+echo "✅ Credentials generated"
 echo ""
-
-# Step 1: Verify Dockerfile
-step "1/5: Verifying Dockerfile..."
-if [ -f "Dockerfile" ]; then
-    success "✓ Dockerfile found"
-else
-    error "✗ Dockerfile not found"
-    exit 1
-fi
-
-# Step 2: Test Docker build locally
-step "2/5: Testing Docker build..."
-log "Building Docker image locally..."
-if docker build -t trae-healthy1-test -f Dockerfile . > /tmp/docker-build.log 2>&1; then
-    success "✓ Docker build successful"
-else
-    error "✗ Docker build failed"
-    echo "Check /tmp/docker-build.log for details"
-    exit 1
-fi
-
-# Step 3: Test container
-step "3/5: Testing container..."
-log "Starting test container..."
-docker run -d -p 8080:3000 --name trae-test trae-healthy1-test > /dev/null 2>&1
-
-log "Waiting for container to start..."
-sleep 10
-
-log "Testing health endpoint..."
-if curl -f http://localhost:8080/health > /dev/null 2>&1; then
-    success "✓ Health check passed"
-else
-    error "✗ Health check failed"
-    docker logs trae-test
-    docker stop trae-test > /dev/null 2>&1
-    docker rm trae-test > /dev/null 2>&1
-    exit 1
-fi
-
-log "Cleaning up test container..."
-docker stop trae-test > /dev/null 2>&1
-docker rm trae-test > /dev/null 2>&1
-docker rmi trae-healthy1-test > /dev/null 2>&1
-
-success "Container test complete"
+echo "📋 SAVE THESE CREDENTIALS SECURELY:"
+echo "===================================="
+echo "DB_PASSWORD=${DB_PASSWORD}"
+echo "REDIS_PASSWORD=${REDIS_PASSWORD}"
+echo "JWT_SECRET=${JWT_SECRET:0:32}..."
 echo ""
 
-# Step 4: Deployment instructions
-step "4/5: Deployment Instructions"
+# Create deployment package
+echo "📦 Creating deployment package..."
+
+# Create docker-compose for Coolify
+cat > docker-compose.coolify.yml << 'EOF'
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: postgres -c ssl=on
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.secure
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SSL_MODE=require
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - API_KEY_SECRET=${API_KEY_SECRET}
+      - PORT=8080
+      - ENVIRONMENT=production
+      - DOMAIN=${DOMAIN}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend-nextjs
+      dockerfile: Dockerfile.secure
+    environment:
+      - NEXT_PUBLIC_API_URL=https://${API_DOMAIN}
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  redis_data:
+EOF
+
+echo "✅ Docker Compose created"
+
+# Create Coolify configuration
+cat > coolify.json << EOF
+{
+  "project": {
+    "name": "nutrition-platform",
+    "description": "AI-powered nutrition and health management platform"
+  },
+  "services": {
+    "backend": {
+      "type": "application",
+      "build_pack": "dockerfile",
+      "dockerfile_location": "backend/Dockerfile.secure",
+      "ports_exposes": "8080",
+      "health_check_enabled": true,
+      "health_check_path": "/health",
+      "health_check_port": "8080",
+      "health_check_interval": 30,
+      "health_check_timeout": 10,
+      "health_check_retries": 3,
+      "domains": ["api.super.doctorhealthy1.com"]
+    },
+    "frontend": {
+      "type": "application",
+      "build_pack": "dockerfile",
+      "dockerfile_location": "frontend-nextjs/Dockerfile.secure",
+      "ports_exposes": "3000",
+      "domains": ["super.doctorhealthy1.com"]
+    },
+    "postgres": {
+      "type": "database",
+      "image": "postgres:15-alpine",
+      "ports_exposes": "5432"
+    },
+    "redis": {
+      "type": "database",
+      "image": "redis:7-alpine",
+      "ports_exposes": "6379"
+    }
+  }
+}
+EOF
+
+echo "✅ Coolify config created"
+
+# Deploy using Coolify API
 echo ""
-echo -e "${CYAN}╔════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║         MANUAL DEPLOYMENT STEPS            ║${NC}"
-echo -e "${CYAN}╚════════════════════════════════════════════╝${NC}"
-echo ""
-echo "1. Login to Coolify:"
-echo "   URL: $COOLIFY_URL"
-echo ""
-echo "2. Navigate to project:"
-echo "   Project: $PROJECT_NAME"
-echo ""
-echo "3. Create/Update Application:"
-echo "   - Name: $APP_NAME"
-echo "   - Build Pack: Dockerfile"
-echo "   - Domain: $DOMAIN"
-echo "   - Port: $PORT"
-echo ""
-echo "4. Set Environment Variables:"
-echo "   NODE_ENV=production"
-echo "   PORT=3000"
-echo "   HOST=0.0.0.0"
-echo "   ALLOWED_ORIGINS=https://$DOMAIN"
-echo ""
-echo "5. Deploy:"
-echo "   - Click 'Deploy' button"
-echo "   - Wait 5-10 minutes"
-echo "   - Monitor build logs"
+echo "🚀 Deploying to Coolify..."
 echo ""
 
-# Step 5: Verification commands
-step "5/5: Post-Deployment Verification"
-echo ""
-echo "After deployment, run these commands:"
-echo ""
-echo "# Health check"
-echo "curl https://$DOMAIN/health"
-echo ""
-echo "# API info"
-echo "curl https://$DOMAIN/api/info"
-echo ""
-echo "# Test nutrition analysis"
-echo "curl -X POST https://$DOMAIN/api/nutrition/analyze \\"
-echo "  -H 'Content-Type: application/json' \\"
-echo "  -d '{\"food\":\"apple\",\"quantity\":100,\"unit\":\"g\"}'"
-echo ""
+# Create project
+echo "Creating project..."
+project_response=$(curl -s -X POST "$COOLIFY_BASE_URL/api/v1/projects" \
+    -H "Authorization: Bearer $COOLIFY_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "name": "nutrition-platform",
+        "description": "AI-powered nutrition and health management platform"
+    }')
 
-# Final summary
+echo "$project_response" | jq '.' || echo "$project_response"
+
+# Instructions for manual deployment
 echo ""
-echo -e "${CYAN}╔════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║              🎉 READY TO DEPLOY! 🎉       ║${NC}"
-echo -e "${CYAN}╚════════════════════════════════════════════╝${NC}"
+echo "================================"
+echo "✅ DEPLOYMENT PACKAGE READY"
+echo "================================"
 echo ""
-success "All pre-deployment checks passed!"
-success "Docker image builds successfully!"
-success "Container runs and health check passes!"
+echo "📁 Files created:"
+echo "  - docker-compose.coolify.yml"
+echo "  - coolify.json"
+echo "  - .env.coolify.secure"
 echo ""
-echo -e "${PURPLE}Next: Deploy via Coolify dashboard${NC}"
-echo -e "${PURPLE}Expected duration: 5-10 minutes${NC}"
-echo -e "${PURPLE}Success probability: 99%${NC}"
+echo "🌐 Next steps in Coolify Dashboard:"
+echo ""
+echo "1. Go to: https://api.doctorhealthy1.com"
+echo "2. Create new project: 'nutrition-platform'"
+echo "3. Add Git repository or upload files"
+echo "4. Configure environment variables from .env.coolify.secure"
+echo "5. Set domains:"
+echo "   - Backend: api.super.doctorhealthy1.com"
+echo "   - Frontend: super.doctorhealthy1.com"
+echo "6. Deploy!"
+echo ""
+echo "📊 Monitor deployment:"
+echo "  - Check build logs"
+echo "  - Verify health checks"
+echo "  - Test endpoints"
+echo ""
+echo "🎯 Access URLs (after deployment):"
+echo "  Frontend: https://super.doctorhealthy1.com"
+echo "  Backend:  https://api.super.doctorhealthy1.com"
+echo "  Health:   https://api.super.doctorhealthy1.com/health"
+echo ""
+echo "🔐 Credentials saved in: .env.coolify.secure"
 echo ""

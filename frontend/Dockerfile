@@ -1,35 +1,57 @@
-# Frontend Dockerfile for Nutrition Platform
-FROM nginx:alpine
+# Build stage
+FROM node:18-alpine AS builder
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Install build dependencies
+RUN apk add --no-cache libc6-compat
 
-# Copy static files
-COPY . /usr/share/nginx/html
+# Set working directory
+WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nginxuser && \
-    adduser -S nginxuser -u 1001 -G nginxuser
+# Copy package files
+COPY package*.json ./
 
-# Create necessary directories
-RUN mkdir -p /var/cache/nginx/client_temp \
-             /var/cache/nginx/proxy_temp \
-             /var/cache/nginx/fastcgi_temp \
-             /var/cache/nginx/uwsgi_temp \
-             /var/cache/nginx/scgi_temp && \
-    chown -R nginxuser:nginxuser /var/cache/nginx && \
-    chown -R nginxuser:nginxuser /usr/share/nginx/html && \
-    chown -R nginxuser:nginxuser /etc/nginx/conf.d
+# Install dependencies
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine AS runner
+
+# Install runtime dependencies
+RUN apk add --no-cache curl
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Set working directory
+WORKDIR /app
+
+# Copy public files
+COPY --from=builder /app/public ./public
+
+# Copy build output
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Switch to non-root user
-USER nginxuser
+USER nextjs
 
 # Expose port
-EXPOSE 80
+EXPOSE 3000
+
+# Set environment
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000 || exit 1
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["node", "server.js"]

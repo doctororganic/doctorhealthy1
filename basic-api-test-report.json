@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-11-11T20:27:48+02:00",
+  "summary": {
+    "total": 14,
+    "passed": 9,
+    "failed": 5,
+    "successRate": 64.2
+  },
+  "environment": {
+    "frontend": "http://localhost:3000",
+    "backend": "http://localhost:8080",
+    "platform": "Darwin",
+    "node_version": "v25.1.0"
+  }
+}

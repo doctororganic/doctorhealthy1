@@ -427,6 +427,16 @@ func generateAlertEventID() string {
 	return fmt.Sprintf("alert-%d-%s", time.Now().UnixNano(), randomString(6))
 }
 
+// randomString generates a random string of specified length
+func randomString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[time.Now().UnixNano()%int64(len(charset))]
+	}
+	return string(b)
+}
+
 func loadEmailConfig() *EmailConfig {
 	host := getEnvOrDefault("SMTP_HOST", "")
 	if host == "" {

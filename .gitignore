@@ -168,3 +168,11 @@ node_modules/
 !.env.example
 coolify-env-vars.txt
 secrets/
+
+# Coolify Credentials
+.coolify-credentials.enc
+*credentials*
+*.key
+*.pem
+.env.coolify
+COOLIFY-CREDENTIALS-SECURE.md

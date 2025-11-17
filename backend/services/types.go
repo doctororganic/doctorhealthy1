@@ -21,13 +21,10 @@ func NewMetadata() Metadata {
 	}
 }
 
-type UserService struct{}
+// Types from other files are now in separate files
+
 type FoodService struct{}
 type LogService struct{}
-
-func NewUserService() *UserService {
-	return &UserService{}
-}
 
 func NewFoodService() *FoodService {
 	return &FoodService{}

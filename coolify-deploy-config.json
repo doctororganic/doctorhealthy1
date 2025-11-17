@@ -1,0 +1,24 @@
+{
+  "project": "nutrition-platform",
+  "environment": "production",
+  "domain": "super.doctorhealthy1.com",
+  "services": {
+    "backend": {
+      "image": "nutrition-backend",
+      "port": 8080,
+      "healthcheck": "/health"
+    },
+    "frontend": {
+      "image": "nutrition-frontend",
+      "port": 3000
+    },
+    "postgres": {
+      "image": "postgres:15-alpine",
+      "port": 5432
+    },
+    "redis": {
+      "image": "redis:7-alpine",
+      "port": 6379
+    }
+  }
+}

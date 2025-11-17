@@ -10,10 +10,13 @@ import (
 	"unicode"
 
 	"nutrition-platform/errors"
+
+	"github.com/go-playground/validator/v10"
 )
 
 // InputValidator provides comprehensive input validation
 type InputValidator struct {
+	validator             *validator.Validate
 	sqlInjectionPatterns  []string
 	xssPatterns           []string
 	commandPatterns       []string
@@ -42,7 +45,12 @@ type ValidationContext struct {
 
 // NewInputValidator creates a new input validator
 func NewInputValidator() *InputValidator {
+	v := validator.New()
+	
+	// Register custom validations if needed
+	
 	return &InputValidator{
+		validator:             v,
 		sqlInjectionPatterns:  getSQLInjectionPatterns(),
 		xssPatterns:           getXSSPatterns(),
 		commandPatterns:       getCommandInjectionPatterns(),
@@ -52,7 +60,16 @@ func NewInputValidator() *InputValidator {
 
 // Validate implements echo.Validator interface
 func (v *InputValidator) Validate(i interface{}) error {
-	// Basic validation - can be extended as needed
+	// Use go-playground/validator for struct validation
+	if v.validator == nil {
+		return fmt.Errorf("validator not initialized")
+	}
+	
+	err := v.validator.Struct(i)
+	if err != nil {
+		return err
+	}
+	
 	return nil
 }
 

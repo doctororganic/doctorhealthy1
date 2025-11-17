@@ -1,8 +1,8 @@
-# Multi-stage build for Go application
+# Build stage
 FROM golang:1.21-alpine AS builder
 
-# Install necessary packages
-RUN apk add --no-cache git ca-certificates tzdata sqlite
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates tzdata
 
 # Set working directory
 WORKDIR /app
@@ -17,28 +17,30 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -o nutrition-platform .
+RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o nutrition-server main.go
 
 # Final stage
 FROM alpine:latest
 
 # Install runtime dependencies
-RUN apk --no-cache add ca-certificates curl sqlite
+RUN apk --no-cache add ca-certificates tzdata curl
 
-# Create app user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
 
 # Set working directory
 WORKDIR /app
 
 # Copy binary from builder stage
-COPY --from=builder /app/nutrition-platform .
+COPY --from=builder /app/nutrition-server .
 
-# Copy migration files
-COPY --from=builder /app/migrations ./migrations
+# Copy data files
+COPY --from=builder /app/data ./data
 
-# Create data directory for SQLite
-RUN mkdir -p /app/data && chown -R appuser:appgroup /app
+# Create necessary directories
+RUN mkdir -p logs backups ssl && \
+    chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
@@ -50,5 +52,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
-# Start the application
-CMD ["./nutrition-platform"]
+# Run the application
+CMD ["./nutrition-server"]

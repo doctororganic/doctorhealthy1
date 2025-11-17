@@ -1,3 +1,4 @@
+// Package config provides application configuration management
 package config
 
 import (
@@ -6,54 +7,54 @@ import (
 	"strings"
 )
 
-// FileStorageConfig holds file storage configuration
-type FileStorageConfig struct {
-	StorageType string `json:"storage_type"`
-	BasePath    string `json:"base_path"`
-	BaseURL     string `json:"base_url"`
-	S3Bucket    string `json:"s3_bucket"`
-	S3Region    string `json:"s3_region"`
-	S3URL       string `json:"s3_url"`
+// Config holds the application configuration
+type Config struct {
+	Port              string
+	DatabaseURL       string
+	JWTSecret         string
+	Environment       string
+	ReadTimeout       int
+	WriteTimeout      int
+	KeepAliveTimeout  int
+	FileStorage       FileStorageConfig
+	EmailConfig       EmailConfig
+	PushConfig        PushConfig
 }
 
-// AppConfig holds application configuration
-type AppConfig struct {
-	Port              string             `json:"port"`
-	DatabaseURL       string             `json:"database_url"`
-	JWTSecret         string             `json:"jwt_secret"`
-	Environment       string             `json:"environment"`
-	ReadTimeout       int                `json:"read_timeout"`
-	WriteTimeout      int                `json:"write_timeout"`
-	KeepAliveTimeout  int                `json:"keep_alive_timeout"`
-	FileStorage       FileStorageConfig   `json:"file_storage"`
-	EmailConfig       EmailConfig        `json:"email"`
-	PushConfig        PushConfig         `json:"push"`
+// FileStorageConfig holds file storage configuration
+type FileStorageConfig struct {
+	StorageType string
+	BasePath    string
+	BaseURL     string
+	S3Bucket    string
+	S3Region    string
+	S3URL       string
 }
 
 // EmailConfig holds email service configuration
 type EmailConfig struct {
-	Provider   string `json:"provider"`
-	SMTPHost   string `json:"smtp_host"`
-	SMTPPort   int    `json:"smtp_port"`
-	SMTPUser   string `json:"smtp_user"`
-	SMTPPass   string `json:"smtp_pass"`
-	FromEmail  string `json:"from_email"`
-	FromName   string `json:"from_name"`
+	Provider   string
+	SMTPHost   string
+	SMTPPort   int
+	SMTPUser   string
+	SMTPPass   string
+	FromEmail  string
+	FromName   string
 }
 
 // PushConfig holds push notification configuration
 type PushConfig struct {
-	FCMServerKey string `json:"fcm_server_key"`
-	APNSKeyPath  string `json:"apns_key_path"`
-	APNSKeyID    string `json:"apns_key_id"`
-	APNSTeamID   string `json:"apns_team_id"`
+	FCMServerKey string
+	APNSKeyPath  string
+	APNSKeyID    string
+	APNSTeamID   string
 }
 
 // LoadConfig loads configuration from environment variables
-func LoadConfig() *AppConfig {
-	config := &AppConfig{
+func LoadConfig() *Config {
+	config := &Config{
 		Port:             getEnv("PORT", "8080"),
-		DatabaseURL:      getEnv("DATABASE_URL", "postgres://localhost/nutrition_platform?sslmode=disable"),
+		DatabaseURL:      getEnv("DATABASE_URL", "sqlite3://./nutrition_platform.db"),
 		JWTSecret:        getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
 		Environment:      getEnv("ENVIRONMENT", "development"),
 		ReadTimeout:      getEnvAsInt("READ_TIMEOUT", 30),
@@ -93,22 +94,22 @@ func LoadConfig() *AppConfig {
 }
 
 // IsDevelopment checks if the environment is development
-func (c *AppConfig) IsDevelopment() bool {
+func (c *Config) IsDevelopment() bool {
 	return c.Environment == "development"
 }
 
 // IsProduction checks if the environment is production
-func (c *AppConfig) IsProduction() bool {
+func (c *Config) IsProduction() bool {
 	return c.Environment == "production"
 }
 
 // IsLocalStorage checks if using local file storage
-func (c *AppConfig) IsLocalStorage() bool {
+func (c *Config) IsLocalStorage() bool {
 	return c.FileStorage.StorageType == "local"
 }
 
 // IsS3Storage checks if using S3 file storage
-func (c *AppConfig) IsS3Storage() bool {
+func (c *Config) IsS3Storage() bool {
 	return c.FileStorage.StorageType == "s3"
 }
 
@@ -144,4 +145,9 @@ func getEnvAsSlice(key string, defaultValue []string) []string {
 		return strings.Split(value, ",")
 	}
 	return defaultValue
+}
+
+// GetDatabaseURL returns the database URL for the current environment
+func (c *Config) GetDatabaseURL() string {
+	return c.DatabaseURL
 }

@@ -1,74 +1,139 @@
 version: '3.8'
 
 services:
-  # Go Backend
+  # Backend Service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: nutrition-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      - PORT=8080
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=nutrition_platform
-      - DB_USER=nutrition_user
-      - DB_PASSWORD=nutrition_pass
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - ENVIRONMENT=production
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - GIN_MODE=release
+      - DB_PATH=/app/data/nutrition.db
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - API_SECRET=${API_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - CORS_ORIGINS=${FRONTEND_URL}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+      - ./ssl:/app/ssl
     depends_on:
-      - postgres
       - redis
-    restart: unless-stopped
     networks:
       - nutrition-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Next.js Frontend
+  # Frontend Service
   frontend:
     build:
-      context: ./frontend-nextjs
+      context: ./frontend
       dockerfile: Dockerfile
+    container_name: nutrition-frontend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
+      - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://backend:8080
     depends_on:
       - backend
-    restart: unless-stopped
     networks:
       - nutrition-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=nutrition_platform
-      - POSTGRES_USER=nutrition_user
-      - POSTGRES_PASSWORD=nutrition_pass
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-    networks:
-      - nutrition-network
-
-  # Redis Cache
+  # Redis Service
   redis:
     image: redis:7-alpine
+    container_name: nutrition-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis-data:/data
+    networks:
+      - nutrition-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: nutrition-nginx
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
     networks:
       - nutrition-network
 
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: nutrition-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - nutrition-network
+    profiles:
+      - monitoring
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nutrition-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - nutrition-network
+    profiles:
+      - monitoring
+
 volumes:
-  postgres_data:
-  redis_data:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
 
 networks:
   nutrition-network:

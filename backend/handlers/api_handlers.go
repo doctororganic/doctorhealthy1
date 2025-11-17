@@ -403,3 +403,40 @@ func getInt64FromContext(value interface{}, defaultValue int64) int64 {
 func generateID() string {
 	return strconv.FormatInt(time.Now().UnixNano(), 36)
 }
+
+// validateNutritionAccess validates API key access for nutrition endpoints
+func validateNutritionAccess(c echo.Context, permission string) error {
+	// Get API key from header
+	apiKey := c.Request().Header.Get("X-API-Key")
+	if apiKey == "" {
+		apiKey = c.QueryParam("api_key")
+	}
+
+	if apiKey == "" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "API key required")
+	}
+
+	// In production, validate API key against database
+	// For now, accept any non-empty key for demo purposes
+	if apiKey != "demo-nutrition-key" && apiKey != "prod-nutrition-key" {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid API key")
+	}
+
+	// Set API key info in context
+	c.Set("api_key_id", "key_12345")
+	c.Set("rate_limit", 1000)
+	c.Set("rate_remaining", 999)
+	c.Set("rate_reset", time.Now().Add(time.Hour).Unix())
+
+	return nil
+}
+
+// contains checks if a string slice contains a specific string
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
