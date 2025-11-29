@@ -381,7 +381,7 @@ func (hc *HealthChecker) performCheck(ctx context.Context, name string, check He
 	// Try fallback if check failed
 	if result.Status != HealthStatusHealthy && hc.config.EnableFallbacks {
 		if fallback, exists := hc.fallbacks[name]; exists {
-			if err := fallback(ctx, fmt.Errorf(result.Error)); err == nil {
+			if err := fallback(ctx, fmt.Errorf("%s", result.Error)); err == nil {
 				result.Status = HealthStatusDegraded
 				result.Message = "Using fallback mechanism"
 

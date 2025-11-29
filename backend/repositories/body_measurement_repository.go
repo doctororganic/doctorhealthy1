@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"time"
 
+	"nutrition-platform/database"
 	"nutrition-platform/models"
 )
 
 type BodyMeasurementRepository struct {
-	db *sql.DB
+	db *database.Database
 }
 
-func NewBodyMeasurementRepository(db *sql.DB) *BodyMeasurementRepository {
+func NewBodyMeasurementRepository(db *database.Database) *BodyMeasurementRepository {
 	return &BodyMeasurementRepository{db: db}
 }
 
@@ -30,7 +31,7 @@ func (r *BodyMeasurementRepository) CreateBodyMeasurement(ctx context.Context, m
 		RETURNING id, created_at, updated_at`
 
 	now := time.Now()
-	err := r.db.QueryRowContext(ctx, query,
+	err := r.db.DB.QueryRowContext(ctx, query,
 		measurement.UserID,
 		measurement.MeasurementDate,
 		measurement.Weight,
@@ -71,7 +72,7 @@ func (r *BodyMeasurementRepository) GetBodyMeasurementByID(ctx context.Context, 
 		WHERE id = $1`
 
 	var measurement models.BodyMeasurement
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
+	err := r.db.DB.QueryRowContext(ctx, query, id).Scan(
 		&measurement.ID,
 		&measurement.UserID,
 		&measurement.MeasurementDate,
@@ -117,7 +118,7 @@ func (r *BodyMeasurementRepository) GetBodyMeasurementsByUserID(ctx context.Cont
 		ORDER BY measurement_date DESC, created_at DESC
 		LIMIT $2 OFFSET $3`
 
-	rows, err := r.db.QueryContext(ctx, query, userID, limit, offset)
+	rows, err := r.db.DB.QueryContext(ctx, query, userID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get body measurements: %w", err)
 	}
@@ -173,7 +174,7 @@ func (r *BodyMeasurementRepository) UpdateBodyMeasurement(ctx context.Context, m
 		RETURNING updated_at`
 
 	now := time.Now()
-	err := r.db.QueryRowContext(ctx, query,
+	err := r.db.DB.QueryRowContext(ctx, query,
 		measurement.MeasurementDate,
 		measurement.Weight,
 		measurement.Height,
@@ -210,7 +211,7 @@ func (r *BodyMeasurementRepository) UpdateBodyMeasurement(ctx context.Context, m
 func (r *BodyMeasurementRepository) DeleteBodyMeasurement(ctx context.Context, id, userID int64) error {
 	query := `DELETE FROM body_measurements WHERE id = $1 AND user_id = $2`
 
-	result, err := r.db.ExecContext(ctx, query, id, userID)
+	result, err := r.db.DB.ExecContext(ctx, query, id, userID)
 	if err != nil {
 		return fmt.Errorf("failed to delete body measurement: %w", err)
 	}
@@ -239,7 +240,7 @@ func (r *BodyMeasurementRepository) GetBodyMeasurementsByDateRange(ctx context.C
 		ORDER BY measurement_date DESC, created_at DESC
 		LIMIT $4 OFFSET $5`
 
-	rows, err := r.db.QueryContext(ctx, query, userID, startDate, endDate, limit, offset)
+	rows, err := r.db.DB.QueryContext(ctx, query, userID, startDate, endDate, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get body measurements by date range: %w", err)
 	}
@@ -295,7 +296,7 @@ func (r *BodyMeasurementRepository) GetLatestBodyMeasurement(ctx context.Context
 		LIMIT 1`
 
 	var measurement models.BodyMeasurement
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(
+	err := r.db.DB.QueryRowContext(ctx, query, userID).Scan(
 		&measurement.ID,
 		&measurement.UserID,
 		&measurement.MeasurementDate,
@@ -334,7 +335,7 @@ func (r *BodyMeasurementRepository) GetMeasurementCountByUserID(ctx context.Cont
 	query := `SELECT COUNT(*) FROM body_measurements WHERE user_id = $1`
 
 	var count int64
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(&count)
+	err := r.db.DB.QueryRowContext(ctx, query, userID).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get measurement count: %w", err)
 	}
@@ -354,7 +355,7 @@ func (r *BodyMeasurementRepository) GetWeightTrend(ctx context.Context, userID i
 		ORDER BY measurement_date ASC`
 
 	query = fmt.Sprintf(query, days)
-	rows, err := r.db.QueryContext(ctx, query, userID)
+	rows, err := r.db.DB.QueryContext(ctx, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get weight trend: %w", err)
 	}
@@ -386,7 +387,7 @@ func (r *BodyMeasurementRepository) GetBodyFatTrend(ctx context.Context, userID 
 		ORDER BY measurement_date ASC`
 
 	query = fmt.Sprintf(query, days)
-	rows, err := r.db.QueryContext(ctx, query, userID)
+	rows, err := r.db.DB.QueryContext(ctx, query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get body fat trend: %w", err)
 	}
@@ -425,7 +426,7 @@ func (r *BodyMeasurementRepository) GetMeasurementStats(ctx context.Context, use
 	var stats models.MeasurementStats
 	var minBodyFat, maxBodyFat, avgBodyFat sql.NullFloat64
 
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(
+	err := r.db.DB.QueryRowContext(ctx, query, userID).Scan(
 		&stats.TotalMeasurements,
 		&stats.AvgWeight,
 		&stats.MinWeight,
@@ -441,13 +442,13 @@ func (r *BodyMeasurementRepository) GetMeasurementStats(ctx context.Context, use
 	}
 
 	if avgBodyFat.Valid {
-		stats.AvgBodyFat = &avgBodyFat.Float64
+		stats.AvgBodyFat = avgBodyFat.Float64
 	}
 	if minBodyFat.Valid {
-		stats.MinBodyFat = &minBodyFat.Float64
+		stats.MinBodyFat = minBodyFat.Float64
 	}
 	if maxBodyFat.Valid {
-		stats.MaxBodyFat = &maxBodyFat.Float64
+		stats.MaxBodyFat = maxBodyFat.Float64
 	}
 
 	return &stats, nil
@@ -487,7 +488,7 @@ func (r *BodyMeasurementRepository) CompareMeasurements(ctx context.Context, use
 	var startBodyFat, endBodyFat sql.NullFloat64
 	var startWaist, endWaist, startChest, endChest sql.NullFloat64
 
-	err := r.db.QueryRowContext(ctx, query, userID, startDate, endDate).Scan(
+	err := r.db.DB.QueryRowContext(ctx, query, userID, startDate, endDate).Scan(
 		&comparison.StartWeight,
 		&comparison.EndWeight,
 		&startBodyFat,
@@ -508,37 +509,36 @@ func (r *BodyMeasurementRepository) CompareMeasurements(ctx context.Context, use
 	}
 
 	if startBodyFat.Valid {
-		comparison.StartBodyFat = &startBodyFat.Float64
+		comparison.StartBodyFat = startBodyFat.Float64
 	}
 	if endBodyFat.Valid {
-		comparison.EndBodyFat = &endBodyFat.Float64
+		comparison.EndBodyFat = endBodyFat.Float64
 	}
 	if startWaist.Valid {
-		comparison.StartWaist = &startWaist.Float64
+		comparison.StartWaist = startWaist.Float64
 	}
 	if endWaist.Valid {
-		comparison.EndWaist = &endWaist.Float64
+		comparison.EndWaist = endWaist.Float64
 	}
 	if startChest.Valid {
-		comparison.StartChest = &startChest.Float64
+		comparison.StartChest = startChest.Float64
 	}
 	if endChest.Valid {
-		comparison.EndChest = &endChest.Float64
+		comparison.EndChest = endChest.Float64
 	}
 
-	// Calculate differences
-	comparison.WeightChange = comparison.EndWeight - comparison.StartWeight
-	if comparison.StartBodyFat != nil && comparison.EndBodyFat != nil {
-		change := *comparison.EndBodyFat - *comparison.StartBodyFat
-		comparison.BodyFatChange = &change
+	// For body fat, waist, and chest, we need to check if the values were set
+	if startBodyFat.Valid && endBodyFat.Valid {
+		change := comparison.EndBodyFat - comparison.StartBodyFat
+		comparison.BodyFatChange = change
 	}
-	if comparison.StartWaist != nil && comparison.EndWaist != nil {
-		change := *comparison.EndWaist - *comparison.StartWaist
-		comparison.WaistChange = &change
+	if startWaist.Valid && endWaist.Valid {
+		change := comparison.EndWaist - comparison.StartWaist
+		comparison.WaistChange = change
 	}
-	if comparison.StartChest != nil && comparison.EndChest != nil {
-		change := *comparison.EndChest - *comparison.StartChest
-		comparison.ChestChange = &change
+	if startChest.Valid && endChest.Valid {
+		change := comparison.EndChest - comparison.StartChest
+		comparison.ChestChange = change
 	}
 
 	return &comparison, nil
@@ -556,7 +556,7 @@ func (r *BodyMeasurementRepository) SearchBodyMeasurements(ctx context.Context, 
 		ORDER BY measurement_date DESC, created_at DESC
 		LIMIT $3 OFFSET $4`
 
-	rows, err := r.db.QueryContext(ctx, query, userID, "%"+searchTerm+"%", limit, offset)
+	rows, err := r.db.DB.QueryContext(ctx, query, userID, "%"+searchTerm+"%", limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to search body measurements: %w", err)
 	}

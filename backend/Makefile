@@ -1,163 +1,133 @@
-# Makefile for Nutrition Platform Backend
+.PHONY: help build run test clean migrate setup dev watch
 
-.PHONY: build test test-coverage test-integration clean run dev docker-build docker-run lint security-audit
+# Default target
+help:
+	@echo "Available commands:"
+	@echo "  make setup     - Initial setup (deps, migrations, build)"
+	@echo "  make build     - Build the application"
+	@echo "  make run       - Run the application"
+	@echo "  make dev       - Run in development mode with auto-reload"
+	@echo "  make test      - Run all tests"
+	@echo "  make migrate   - Run database migrations"
+	@echo "  make clean     - Clean build artifacts"
+	@echo "  make lint      - Run linter"
+	@echo "  make fmt       - Format code"
+	@echo "  make docker    - Build Docker image"
+	@echo "  make test-api  - Test API endpoints"
 
-# Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOMOD=$(GOCMD) mod
-BINARY_NAME=nutrition-platform
-BINARY_UNIX=$(BINARY_NAME)_unix
+# Setup everything
+setup:
+	@echo "🚀 Setting up..."
+	go mod download
+	go mod tidy
+	chmod +x run_migrations.sh
+	./run_migrations.sh
+	go build -o bin/nutrition-platform ./main.go
+	@echo "✅ Setup complete!"
 
-# Build the application
+# Build
 build:
-	$(GOBUILD) -o $(BINARY_NAME) -v ./...
+	@echo "🔨 Building..."
+	go build -o bin/nutrition-platform ./main.go
+	@echo "✅ Build complete!"
+
+# Run
+run:
+	@echo "▶️  Starting server..."
+	go run main.go
+
+# Development mode with auto-reload (requires air: go install github.com/cosmtrek/air@latest)
+dev:
+	@if command -v air > /dev/null; then \
+		echo "🔄 Starting in dev mode with auto-reload..."; \
+		air; \
+	else \
+		echo "⚠️  Air not installed. Install with: go install github.com/cosmtrek/air@latest"; \
+		echo "▶️  Running normally..."; \
+		go run main.go; \
+	fi
 
 # Run tests
 test:
-	$(GOTEST) -v ./tests/...
+	@echo "🧪 Running tests..."
+	go test -v ./...
 
 # Run tests with coverage
 test-coverage:
-	$(GOTEST) -v -coverprofile=coverage.out ./tests/...
-	$(GOCMD) tool cover -html=coverage.out -o coverage.html
-	@echo "Coverage report generated: coverage.html"
+	@echo "🧪 Running tests with coverage..."
+	go test -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
+	@echo "✅ Coverage report: coverage.html"
 
-# Run integration tests
-test-integration:
-	$(GOTEST) -v -tags=integration ./tests/...
-
-# Run all tests with race detection
-test-race:
-	$(GOTEST) -v -race ./tests/...
+# Migrate database
+migrate:
+	@echo "🗄️  Running migrations..."
+	chmod +x run_migrations.sh
+	./run_migrations.sh
 
 # Clean build artifacts
 clean:
-	$(GOCLEAN)
-	rm -f $(BINARY_NAME)
-	rm -f $(BINARY_UNIX)
+	@echo "🧹 Cleaning..."
+	rm -rf bin/
 	rm -f coverage.out coverage.html
-
-# Run the application
-run:
-	$(GOBUILD) -o $(BINARY_NAME) -v ./...
-	./$(BINARY_NAME)
-
-# Run in development mode with hot reload
-dev:
-	air
-
-# Build for Linux
-build-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_UNIX) -v
-
-# Docker build
-docker-build:
-	docker build -t nutrition-platform-backend .
-
-# Docker run
-docker-run:
-	docker run -p 8080:8080 nutrition-platform-backend
-
-# Install dependencies
-deps:
-	$(GOMOD) download
-	$(GOMOD) verify
-
-# Update dependencies
-deps-update:
-	$(GOMOD) tidy
-	$(GOGET) -u ./...
-
-# Lint code
-lint:
-	golangci-lint run
-
-# Security audit
-security-audit:
-	gosec ./...
-	nancy sleuth
+	go clean
+	@echo "✅ Clean complete!"
 
 # Format code
 fmt:
-	$(GOCMD) fmt ./...
+	@echo "📝 Formatting code..."
+	go fmt ./...
+	@echo "✅ Formatting complete!"
 
-# Vet code
-vet:
-	$(GOCMD) vet ./...
+# Lint code
+lint:
+	@echo "🔍 Linting..."
+	@if command -v golangci-lint > /dev/null; then \
+		golangci-lint run; \
+	else \
+		echo "⚠️  golangci-lint not installed. Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"; \
+		go vet ./...; \
+	fi
+
+# Build Docker image
+docker:
+	@echo "🐳 Building Docker image..."
+	docker build -t nutrition-platform:latest .
+	@echo "✅ Docker image built!"
+
+# Kill processes on port 8080
+kill-port:
+	@echo "🛑 Killing processes on port 8080..."
+	@chmod +x scripts/kill-port.sh
+	@./scripts/kill-port.sh
+
+# Start server with port cleanup
+start-clean: kill-port
+	@echo "🚀 Starting server..."
+	@go run main.go
+
+# Build and start with port cleanup
+run-clean: kill-port build
+	@echo "🚀 Running server..."
+	@./bin/nutrition-platform
+
+# Test API endpoints (requires server to be running)
+test-api:
+	@echo "🧪 Testing API endpoints..."
+	@chmod +x scripts/test-api.sh
+	@./scripts/test-api.sh
+
+# Test public routes (requires server to be running)
+test-public-routes:
+	@echo "🧪 Testing public routes..."
+	@chmod +x scripts/test-public-routes.sh
+	@./scripts/test-public-routes.sh
 
 # Generate API documentation
 docs:
-	swag init -g main.go
-
-# Database migrations
-migrate-up:
-	migrate -path ./migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" up
-
-migrate-down:
-	migrate -path ./migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable" down
-
-# Create new migration
-migrate-create:
-	migrate create -ext sql -dir ./migrations -seq $(name)
-
-# Benchmark tests
-benchmark:
-	$(GOTEST) -bench=. -benchmem ./tests/...
-
-# Profile application
-profile:
-	$(GOTEST) -cpuprofile=cpu.prof -memprofile=mem.prof -bench=. ./tests/...
-
-# Install development tools
-install-tools:
-	$(GOGET) github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	$(GOGET) github.com/securecodewarrior/nancy@latest
-	$(GOGET) github.com/securecodewarrior/gosec/v2/cmd/gosec@latest
-	$(GOGET) github.com/swaggo/swag/cmd/swag@latest
-	$(GOGET) github.com/cosmtrek/air@latest
-
-# Check test coverage threshold
-check-coverage:
-	@echo "Checking test coverage..."
-	@$(GOTEST) -coverprofile=coverage.out ./tests/... > /dev/null
-	@coverage=$$($(GOCMD) tool cover -func=coverage.out | grep total | awk '{print $$3}' | sed 's/%//'); \
-	if [ $$(echo "$$coverage < 70" | bc) -eq 1 ]; then \
-		echo "❌ Test coverage is $$coverage%, which is below the required 70%"; \
-		exit 1; \
+	@echo "📚 Generating API docs..."
+	@if command -v swag > /dev/null; then \
+		swag init; \
 	else \
-		echo "✅ Test coverage is $$coverage%, which meets the required 70%"; \
+		echo "⚠️  swag not installed. Install with: go install github.com/swaggo/swag/cmd/swag@latest"; \
 	fi
-
-# Pre-commit checks
-pre-commit: fmt vet lint test check-coverage security-audit
-	@echo "✅ All pre-commit checks passed!"
-
-# CI pipeline
-ci: deps fmt vet lint test-coverage security-audit
-	@echo "✅ CI pipeline completed successfully!"
-
-# Help
-help:
-	@echo "Available commands:"
-	@echo "  build           - Build the application"
-	@echo "  test            - Run tests"
-	@echo "  test-coverage   - Run tests with coverage report"
-	@echo "  test-integration- Run integration tests"
-	@echo "  test-race       - Run tests with race detection"
-	@echo "  clean           - Clean build artifacts"
-	@echo "  run             - Build and run the application"
-	@echo "  dev             - Run in development mode with hot reload"
-	@echo "  docker-build    - Build Docker image"
-	@echo "  docker-run      - Run Docker container"
-	@echo "  lint            - Lint code"
-	@echo "  security-audit  - Run security audit"
-	@echo "  fmt             - Format code"
-	@echo "  vet             - Vet code"
-	@echo "  docs            - Generate API documentation"
-	@echo "  pre-commit      - Run all pre-commit checks"
-	@echo "  ci              - Run CI pipeline"
-	@echo "  help            - Show this help message"

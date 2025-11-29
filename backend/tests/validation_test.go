@@ -1,13 +1,14 @@
-package validation
+package tests
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"nutrition-platform/validation"
 )
 
 func TestInputValidator_Validate(t *testing.T) {
-	validator := NewInputValidator()
+	validator := validation.NewInputValidator()
 
 	// Test struct for validation
 	type TestStruct struct {
@@ -101,7 +102,7 @@ func TestValidateEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateEmail(tt.email)
+			err := validation.ValidateEmail(tt.email)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -112,8 +113,8 @@ func TestValidateEmail(t *testing.T) {
 }
 
 func TestValidateInput_Security(t *testing.T) {
-	validator := NewInputValidator()
-	context := &ValidationContext{
+	validator := validation.NewInputValidator()
+	context := &validation.ValidationContext{
 		UserRole:  "user",
 		IPAddress: "127.0.0.1",
 		UserAgent: "test-agent",

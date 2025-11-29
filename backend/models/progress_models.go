@@ -306,16 +306,17 @@ type WeightGoalPrediction struct {
 
 // WorkoutLog represents a workout log entry
 type WorkoutLog struct {
-	ID              uint      `json:"id" db:"id"`
-	UserID          uint      `json:"user_id" db:"user_id"`
-	WorkoutPlanID   *uint     `json:"workout_plan_id,omitempty" db:"workout_plan_id"`
-	WorkoutDate     time.Time `json:"workout_date" db:"workout_date"`
-	DurationMinutes int       `json:"duration_minutes" db:"duration_minutes"` // in minutes
-	Notes           *string   `json:"notes,omitempty" db:"notes"`
-	CaloriesBurned  *int      `json:"calories_burned,omitempty" db:"calories_burned"`
-	Completed       bool      `json:"completed" db:"completed"`
-	CreatedAt       time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at" db:"updated_at"`
+	ID                uint              `json:"id" db:"id"`
+	UserID            uint              `json:"user_id" db:"user_id"`
+	WorkoutPlanID     *uint             `json:"workout_plan_id,omitempty" db:"workout_plan_id"`
+	WorkoutDate       time.Time         `json:"workout_date" db:"workout_date"`
+	DurationMinutes   int               `json:"duration_minutes" db:"duration_minutes"` // in minutes
+	CompletedExercises CompletedExercises `json:"completed_exercises,omitempty" db:"completed_exercises"`
+	Notes             *string           `json:"notes,omitempty" db:"notes"`
+	CaloriesBurned    *int              `json:"calories_burned,omitempty" db:"calories_burned"`
+	Completed         bool              `json:"completed" db:"completed"`
+	CreatedAt         time.Time         `json:"created_at" db:"created_at"`
+	UpdatedAt         time.Time         `json:"updated_at" db:"updated_at"`
 }
 
 // ListWorkoutLogsRequest represents a request to list workout logs

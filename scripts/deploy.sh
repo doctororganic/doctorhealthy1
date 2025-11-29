@@ -1,215 +1,328 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Production Deployment Script for Nutrition Platform
-# This script handles the complete deployment process
+# Deployment script for Nutrition Platform
+# Usage: ./scripts/deploy.sh [environment] [version]
 
-set -e  # Exit on any error
-
-# Configuration
-PROJECT_NAME="nutrition-platform"
-BACKUP_DIR="/opt/backups/${PROJECT_NAME}"
-LOG_FILE="/var/log/${PROJECT_NAME}-deploy.log"
-ENV_FILE=".env.production"
+ENVIRONMENT="${1:-staging}"
+VERSION="${2:-latest}"
+REGION="${AWS_REGION:-us-east-1}"
+BACKEND_IMAGE="nutrition-platform/backend"
+FRONTEND_IMAGE="nutrition-platform/frontend"
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Logging function
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-# Print colored output
-print_status() {
-    echo -e "${GREEN}[INFO]${NC} $1"
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
-print_warning() {
+log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-print_error() {
+log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if running as root
-check_root() {
-    if [[ $EUID -eq 0 ]]; then
-        print_error "This script should not be run as root"
-        exit 1
-    fi
-}
-
-# Check if Docker is installed
-check_docker() {
-    if ! command -v docker &> /dev/null; then
-        print_error "Docker is not installed"
-        exit 1
-    fi
-
-    if ! command -v docker-compose &> /dev/null; then
-        print_error "Docker Compose is not installed"
-        exit 1
-    fi
-}
-
-# Create backup
-create_backup() {
-    print_status "Creating backup..."
-    BACKUP_DATE=$(date +%Y%m%d_%H%M%S)
-    BACKUP_PATH="${BACKUP_DIR}/${BACKUP_DATE}"
-    
-    mkdir -p "$BACKUP_PATH"
-    
-    # Backup database
-    if [ -f "data/nutrition.db" ]; then
-        cp data/nutrition.db "$BACKUP_PATH/"
-        log "Database backed up to $BACKUP_PATH/nutrition.db"
-    fi
-    
-    # Backup configuration
-    if [ -f "$ENV_FILE" ]; then
-        cp "$ENV_FILE" "$BACKUP_PATH/"
-        log "Configuration backed up to $BACKUP_PATH/$ENV_FILE"
-    fi
-    
-    # Backup logs
-    if [ -d "logs" ]; then
-        cp -r logs "$BACKUP_PATH/"
-        log "Logs backed up to $BACKUP_PATH/logs"
-    fi
-    
-    print_status "Backup created at $BACKUP_PATH"
 }
 
 # Validate environment
 validate_environment() {
-    print_status "Validating environment..."
-    
-    if [ ! -f "$ENV_FILE" ]; then
-        print_error "Environment file $ENV_FILE not found"
+    if [[ ! "$ENVIRONMENT" =~ ^(staging|production)$ ]]; then
+        log_error "Invalid environment: $ENVIRONMENT. Must be 'staging' or 'production'"
         exit 1
     fi
     
-    # Check required environment variables
-    source "$ENV_FILE"
+    log_info "Deploying to $ENVIRONMENT (version: $VERSION)"
+}
+
+# Check prerequisites
+check_prerequisites() {
+    log_info "Checking prerequisites..."
     
-    if [ -z "$JWT_SECRET" ] || [ ${#JWT_SECRET} -lt 32 ]; then
-        print_error "JWT_SECRET must be at least 32 characters"
+    # Check if Docker is installed
+    if ! command -v docker &> /dev/null; then
+        log_error "Docker is not installed"
         exit 1
     fi
     
-    print_status "Environment validation passed"
+    # Check if kubectl is installed (for Kubernetes deployment)
+    if ! command -v kubectl &> /dev/null; then
+        log_warning "kubectl is not installed. Kubernetes deployment will be skipped."
+    fi
+    
+    # Check AWS CLI (for AWS deployment)
+    if ! command -v aws &> /dev/null; then
+        log_warning "AWS CLI is not installed. AWS deployment will be skipped."
+    fi
+    
+    log_success "Prerequisites check completed"
 }
 
-# Build Docker images
-build_images() {
-    print_status "Building Docker images..."
+# Build backend
+build_backend() {
+    log_info "Building backend..."
     
-    # Build backend
-    print_status "Building backend image..."
-    docker build -t nutrition-backend:latest backend/
+    cd backend
     
-    # Build frontend
-    print_status "Building frontend image..."
-    docker build -t nutrition-frontend:latest frontend/
+    # Build Go binary
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o nutrition-platform .
     
-    print_status "Docker images built successfully"
+    # Build Docker image
+    docker build -t "${BACKEND_IMAGE}:${VERSION}" .
+    docker tag "${BACKEND_IMAGE}:${VERSION}" "${BACKEND_IMAGE}:latest"
+    
+    cd ..
+    log_success "Backend built successfully"
 }
 
-# Deploy services
-deploy_services() {
-    print_status "Deploying services..."
+# Build frontend
+build_frontend() {
+    log_info "Building frontend..."
     
-    # Stop existing services
-    docker-compose down 2>/dev/null || true
+    cd frontend-nextjs
     
-    # Pull latest images (if any)
-    docker-compose pull
+    # Install dependencies
+    npm ci --production=false
     
-    # Start services
-    docker-compose up -d
+    # Build Next.js app
+    npm run build
     
-    # Wait for services to be healthy
-    print_status "Waiting for services to be healthy..."
-    sleep 30
+    # Build Docker image
+    docker build -t "${FRONTEND_IMAGE}:${VERSION}" .
+    docker tag "${FRONTEND_IMAGE}:${VERSION}" "${FRONTEND_IMAGE}:latest"
     
-    # Check service health
-    if docker-compose ps | grep -q "Up (healthy)"; then
-        print_status "Services are healthy"
+    cd ..
+    log_success "Frontend built successfully"
+}
+
+# Run tests
+run_tests() {
+    log_info "Running tests..."
+    
+    # Backend tests
+    cd backend
+    if ! go test ./... -v; then
+        log_error "Backend tests failed"
+        exit 1
+    fi
+    cd ..
+    
+    # Frontend tests
+    cd frontend-nextjs
+    if ! npm test -- --watchAll=false; then
+        log_error "Frontend tests failed"
+        exit 1
+    fi
+    cd ..
+    
+    log_success "All tests passed"
+}
+
+# Deploy to staging
+deploy_staging() {
+    log_info "Deploying to staging environment..."
+    
+    # Push images to registry (Docker Hub or ECR)
+    if command -v aws &> /dev/null; then
+        # AWS ECR deployment
+        log_info "Pushing to AWS ECR..."
+        
+        # Get ECR login token
+        aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com"
+        
+        # Tag and push backend
+        BACKEND_ECR="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com/${BACKEND_IMAGE}"
+        docker tag "${BACKEND_IMAGE}:${VERSION}" "${BACKEND_ECR}:${VERSION}"
+        docker tag "${BACKEND_IMAGE}:${VERSION}" "${BACKEND_ECR}:latest"
+        docker push "${BACKEND_ECR}:${VERSION}"
+        docker push "${BACKEND_ECR}:latest"
+        
+        # Tag and push frontend
+        FRONTEND_ECR="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com/${FRONTEND_IMAGE}"
+        docker tag "${FRONTEND_IMAGE}:${VERSION}" "${FRONTEND_ECR}:${VERSION}"
+        docker tag "${FRONTEND_IMAGE}:${VERSION}" "${FRONTEND_ECR}:latest"
+        docker push "${FRONTEND_ECR}:${VERSION}"
+        docker push "${FRONTEND_ECR}:latest"
+        
+        # Deploy to Kubernetes
+        if command -v kubectl &> /dev/null; then
+            log_info "Applying Kubernetes manifests..."
+            kubectl apply -f k8s/staging/ --recursive
+            kubectl set image deployment/backend backend="${BACKEND_ECR}:${VERSION}" -n staging
+            kubectl set image deployment/frontend frontend="${FRONTEND_ECR}:${VERSION}" -n staging
+            kubectl rollout status deployment/backend -n staging
+            kubectl rollout status deployment/frontend -n staging
+        fi
     else
-        print_warning "Some services may not be healthy yet"
-        docker-compose ps
+        log_warning "AWS CLI not found. Skipping ECR deployment."
     fi
+    
+    log_success "Staging deployment completed"
+}
+
+# Deploy to production
+deploy_production() {
+    log_info "Deploying to production environment..."
+    
+    # Additional safety checks for production
+    log_warning "Deploying to PRODUCTION environment. Press Ctrl+C to cancel within 10 seconds..."
+    sleep 10
+    
+    # Push images to registry
+    if command -v aws &> /dev/null; then
+        # AWS ECR deployment
+        log_info "Pushing to AWS ECR..."
+        
+        # Get ECR login token
+        aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com"
+        
+        # Tag and push backend
+        BACKEND_ECR="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com/${BACKEND_IMAGE}"
+        docker tag "${BACKEND_IMAGE}:${VERSION}" "${BACKEND_ECR}:${VERSION}"
+        docker tag "${BACKEND_IMAGE}:${VERSION}" "${BACKEND_ECR}:latest"
+        docker push "${BACKEND_ECR}:${VERSION}"
+        docker push "${BACKEND_ECR}:latest"
+        
+        # Tag and push frontend
+        FRONTEND_ECR="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.$REGION.amazonaws.com/${FRONTEND_IMAGE}"
+        docker tag "${FRONTEND_IMAGE}:${VERSION}" "${FRONTEND_ECR}:${VERSION}"
+        docker tag "${FRONTEND_IMAGE}:${VERSION}" "${FRONTEND_ECR}:latest"
+        docker push "${FRONTEND_ECR}:${VERSION}"
+        docker push "${FRONTEND_ECR}:latest"
+        
+        # Deploy to Kubernetes
+        if command -v kubectl &> /dev/null; then
+            log_info "Applying Kubernetes manifests..."
+            kubectl apply -f k8s/production/ --recursive
+            kubectl set image deployment/backend backend="${BACKEND_ECR}:${VERSION}" -n production
+            kubectl set image deployment/frontend frontend="${FRONTEND_ECR}:${VERSION}" -n production
+            kubectl rollout status deployment/backend -n production
+            kubectl rollout status deployment/frontend -n production
+        fi
+    else
+        log_warning "AWS CLI not found. Skipping ECR deployment."
+    fi
+    
+    log_success "Production deployment completed"
 }
 
 # Run health checks
 run_health_checks() {
-    print_status "Running health checks..."
+    log_info "Running health checks..."
+    
+    # Determine the base URL based on environment
+    if [ "$ENVIRONMENT" = "staging" ]; then
+        BASE_URL="https://staging-api.nutrition-platform.com"
+    else
+        BASE_URL="https://api.nutrition-platform.com"
+    fi
     
     # Check backend health
-    if curl -f http://localhost:8080/health > /dev/null 2>&1; then
-        print_status "Backend health check passed"
+    if command -v curl &> /dev/null; then
+        if curl -f -s "${BASE_URL}/health" > /dev/null; then
+            log_success "Backend health check passed"
+        else
+            log_error "Backend health check failed"
+            exit 1
+        fi
+        
+        # Check frontend health
+        FRONTEND_URL="${BASE_URL/api./}"
+        if curl -f -s "${FRONTEND_URL}" > /dev/null; then
+            log_success "Frontend health check passed"
+        else
+            log_error "Frontend health check failed"
+            exit 1
+        fi
     else
-        print_error "Backend health check failed"
+        log_warning "curl not found. Skipping health checks."
+    fi
+}
+
+# Rollback function
+rollback() {
+    log_info "Rolling back deployment..."
+    
+    if [ "$ENVIRONMENT" = "staging" ]; then
+        NAMESPACE="staging"
+    else
+        NAMESPACE="production"
+    fi
+    
+    if command -v kubectl &> /dev/null; then
+        # Rollback backend
+        kubectl rollout undo deployment/backend -n "$NAMESPACE"
+        kubectl rollout status deployment/backend -n "$NAMESPACE"
+        
+        # Rollback frontend
+        kubectl rollout undo deployment/frontend -n "$NAMESPACE"
+        kubectl rollout status deployment/frontend -n "$NAMESPACE"
+        
+        log_success "Rollback completed"
+    else
+        log_error "kubectl not found. Cannot rollback."
         exit 1
     fi
-    
-    # Check frontend
-    if curl -f http://localhost:3000 > /dev/null 2>&1; then
-        print_status "Frontend health check passed"
-    else
-        print_warning "Frontend may still be starting"
-    fi
-    
-    # Check database
-    if [ -f "data/nutrition.db" ]; then
-        print_status "Database file exists"
-    else
-        print_warning "Database file not found - will be created on first run"
-    fi
 }
 
-# Cleanup old backups
-cleanup_backups() {
-    print_status "Cleaning up old backups..."
+# Cleanup function
+cleanup() {
+    log_info "Cleaning up..."
     
-    # Keep last 7 days of backups
-    find "$BACKUP_DIR" -type d -mtime +7 -exec rm -rf {} + 2>/dev/null || true
+    # Remove Docker images
+    docker rmi "${BACKEND_IMAGE}:${VERSION}" 2>/dev/null || true
+    docker rmi "${FRONTEND_IMAGE}:${VERSION}" 2>/dev/null || true
     
-    print_status "Backup cleanup completed"
+    log_success "Cleanup completed"
 }
 
-# Main deployment function
+# Main deployment flow
 main() {
-    print_status "Starting deployment of Nutrition Platform..."
+    log_info "Starting deployment process..."
     
-    # Run deployment steps
-    check_root
-    check_docker
-    create_backup
     validate_environment
-    build_images
-    deploy_services
+    check_prerequisites
+    
+    # Build applications
+    build_backend
+    build_frontend
+    
+    # Run tests
+    run_tests
+    
+    # Deploy based on environment
+    if [ "$ENVIRONMENT" = "staging" ]; then
+        deploy_staging
+    else
+        deploy_production
+    fi
+    
+    # Run health checks
     run_health_checks
-    cleanup_backups
     
-    print_status "Deployment completed successfully!"
-    print_status "Application is running at: http://localhost"
-    print_status "API is available at: http://localhost/api"
-    print_status "Health check: http://localhost/health"
+    # Cleanup
+    cleanup
     
-    # Show running services
-    echo
-    print_status "Running services:"
-    docker-compose ps
+    log_success "Deployment completed successfully!"
 }
 
 # Handle script interruption
-trap 'print_error "Deployment interrupted"; exit 1' INT
+trap 'log_error "Deployment interrupted"; exit 1' INT TERM
+
+# Handle rollback if requested
+if [ "${3:-}" = "rollback" ]; then
+    rollback
+    exit 0
+fi
 
 # Run main function
 main "$@"

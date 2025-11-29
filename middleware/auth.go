@@ -16,11 +16,11 @@ import (
 
 // JWTClaims represents the JWT claims structure
 type JWTClaims struct {
-	UserID   uint   `json:"user_id"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
-	IssuedAt int64  `json:"iat"`
-	ExpiresAt int64 `json:"exp"`
+	UserID    uint   `json:"user_id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	IssuedAt  int64  `json:"iat"`
+	ExpiresAt int64  `json:"exp"`
 }
 
 // JWTAuth middleware for JWT authentication
@@ -60,8 +60,8 @@ func JWTAuth(cfg config.JWTConfig) echo.MiddlewareFunc {
 
 			if err != nil {
 				return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-					"error": "Invalid token",
-					"code":  "INVALID_TOKEN",
+					"error":   "Invalid token",
+					"code":    "INVALID_TOKEN",
 					"details": err.Error(),
 				})
 			}
@@ -274,11 +274,28 @@ func isPublicRoute(path string) bool {
 		"/health",
 		"/api/v1/info",
 		"/api/v1/public/",
+		// Auth routes (public)
 		"/api/v1/auth/login",
 		"/api/v1/auth/register",
 		"/api/v1/auth/forgot-password",
 		"/api/v1/auth/reset-password",
 		"/api/v1/auth/verify-email",
+		"/api/v1/auth/refresh",
+		"/api/v1/auth/logout-all",
+		// Disease routes (all public - serving static JSON data)
+		"/api/v1/diseases",
+		// Injury routes (all public - serving static JSON data)
+		"/api/v1/injuries",
+		// Vitamins and minerals routes (all public - serving static JSON data)
+		"/api/v1/vitamins-minerals",
+		// Nutrition data routes (all public - serving static JSON data)
+		"/api/v1/nutrition-data",
+		"/api/v1/metabolism",
+		"/api/v1/workout-techniques",
+		"/api/v1/meal-plans",
+		"/api/v1/drugs-nutrition",
+		// Validation routes (public for testing)
+		"/api/v1/validation",
 	}
 
 	for _, route := range publicRoutes {

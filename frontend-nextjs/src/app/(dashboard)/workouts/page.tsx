@@ -1,6 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useWorkouts } from '@/hooks/useNutritionData';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 // Types
 interface UserProfile {
@@ -67,24 +71,22 @@ export default function WorkoutsPage() {
   });
 
   const [workoutPlan, setWorkoutPlan] = useState<Exercise[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: workoutData, loading: workoutsLoading, error: workoutsError, refetch: refetchWorkouts, pagination: workoutsPagination } = useWorkouts({ 
+    goal: userProfile.workoutGoal,
+    level: userProfile.activityLevel,
+    page: currentPage, 
+    limit: 20 
+  });
   const [injuryAdvice, setInjuryAdvice] = useState<InjuryAdvice | null>(null);
   const [complaintSolution, setComplaintSolution] = useState<ComplaintSolution | null>(null);
   const [showPlan, setShowPlan] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Workout types
-  const workoutTypes = [
-    'strength',
-    'cardio',
-    'flexibility',
-    'balance',
-    'functional',
-    'plyometric',
-    'endurance',
-    'hiit'
-  ];
+  // Mock data removed - workoutTypes now come from API
 
-  // Complaints from metabolism
+  // Complaint options
   const complaintsList = [
     'fatigue',
     'low_energy',
@@ -96,11 +98,7 @@ export default function WorkoutsPage() {
     'joint_pain',
     'muscle_soreness',
     'weight_gain',
-    'weight_loss_difficulty',
-    'low_libido',
-    'memory_issues',
-    'mood_swings',
-    'hormonal_imbalance'
+    'weight_loss_difficulty'
   ];
 
   // Injury types
@@ -136,185 +134,12 @@ export default function WorkoutsPage() {
 
   // Generate workout plan
   const generateWorkoutPlan = () => {
-    setLoading(true);
-    
-    try {
-      // Generate exercises based on user profile
-      const exercises = generateExercises();
-      setWorkoutPlan(exercises);
-      setShowPlan(true);
-    } catch (error) {
-      console.error('Failed to generate workout plan:', error);
-    } finally {
-      setLoading(false);
-    }
+    setShowPlan(true);
+    refetchWorkouts(); // Load real data from API
   };
 
-  // Generate exercises based on user profile
-  const generateExercises = (): Exercise[] => {
-    const { workoutGoal, workoutLocation, injuries, gender } = userProfile;
-    
-    // Sample exercises - in a real implementation, this would come from a database
-    const exercisePool: Exercise[] = [
-      {
-        name: 'Bench Press',
-        type: 'strength',
-        sets: 4,
-        reps: 10,
-        rest: 90,
-        description: 'Lie on a bench and press a barbell from chest to full arm extension.',
-        commonMistakes: ['Arching your back', 'Bouncing the bar off your chest', 'Not using full range of motion'],
-        alternative: {
-          name: 'Dumbbell Press',
-          type: 'strength',
-          sets: 3,
-          reps: 12,
-          rest: 60,
-          description: 'Lie on a bench and press dumbbells from chest to full arm extension.',
-          commonMistakes: ['Uneven pressing motion', 'Dropping dumbbells too low', 'Flaring elbows out too wide']
-        }
-      },
-      {
-        name: 'Squats',
-        type: 'strength',
-        sets: 4,
-        reps: 12,
-        rest: 90,
-        description: 'Stand with feet shoulder-width apart and lower your body until thighs are parallel to the floor.',
-        commonMistakes: ['Knees caving inward', 'Heels lifting off the floor', 'Leaning too far forward'],
-        alternative: {
-          name: 'Goblet Squats',
-          type: 'strength',
-          sets: 3,
-          reps: 15,
-          rest: 60,
-          description: 'Hold a dumbbell vertically against your chest and perform squats.',
-          commonMistakes: ['Elbows flaring out', 'Not keeping chest up', 'Depth inconsistent']
-        }
-      },
-      {
-        name: 'Deadlifts',
-        type: 'strength',
-        sets: 4,
-        reps: 8,
-        rest: 120,
-        description: 'Lift a barbell from the floor to a standing position, keeping your back straight.',
-        commonMistakes: ['Rounding your back', 'Using momentum instead of strength', 'Not engaging your core'],
-        alternative: {
-          name: 'Romanian Deadlifts',
-          type: 'strength',
-          sets: 3,
-          reps: 12,
-          rest: 90,
-          description: 'Hold a barbell in front of your thighs and hinge at the hips, lowering the bar while keeping your back straight.',
-          commonMistakes: ['Rounding your back', 'Bending knees too much', 'Going too low']
-        }
-      },
-      {
-        name: 'Pull-ups',
-        type: 'strength',
-        sets: 3,
-        reps: 8,
-        rest: 90,
-        description: 'Hang from a bar and pull your body up until your chin is over the bar.',
-        commonMistakes: ['Using momentum', 'Not going through full range of motion', 'Kipping too early'],
-        alternative: {
-          name: 'Lat Pulldowns',
-          type: 'strength',
-          sets: 3,
-          reps: 12,
-          rest: 60,
-          description: 'Sit at a lat pulldown machine and pull the bar down to your chest.',
-          commonMistakes: ['Leaning back too far', 'Using body weight', 'Not controlling the negative']
-        }
-      },
-      {
-        name: 'Running',
-        type: 'cardio',
-        sets: 1,
-        reps: 30,
-        rest: 0,
-        description: 'Run at a steady pace for 30 minutes.',
-        commonMistakes: ['Overstriding', 'Poor running form', 'Not breathing properly'],
-        alternative: {
-          name: 'Cycling',
-          type: 'cardio',
-          sets: 1,
-          reps: 45,
-          rest: 0,
-          description: 'Cycle at a moderate intensity for 45 minutes.',
-          commonMistakes: ['Resistance too low', 'Poor posture', 'Not adjusting seat height']
-        }
-      },
-      {
-        name: 'Push-ups',
-        type: 'strength',
-        sets: 3,
-        reps: 15,
-        rest: 60,
-        description: 'Start in a plank position and lower your body until your chest nearly touches the floor.',
-        commonMistakes: ['Sagging hips', 'Not lowering far enough', 'Elbows flaring out'],
-        alternative: {
-          name: 'Knee Push-ups',
-          type: 'strength',
-          sets: 3,
-          reps: 20,
-          rest: 60,
-          description: 'Start in a plank position with knees on the floor and lower your body.',
-          commonMistakes: ['Hips too high', 'Not lowering far enough', 'Breaking straight line from head to knees']
-        }
-      }
-    ];
-
-    // Filter exercises based on injuries
-    const filteredExercises = exercisePool.filter(exercise => {
-      // Filter out exercises that would aggravate injuries
-      if (injuries.includes('knee_pain') && (exercise.name === 'Squats' || exercise.name === 'Deadlifts')) {
-        return false;
-      }
-      if (injuries.includes('back_pain') && (exercise.name === 'Deadlifts' || exercise.name === 'Bench Press')) {
-        return false;
-      }
-      if (injuries.includes('shoulder_pain') && exercise.name === 'Bench Press') {
-        return false;
-      }
-      return true;
-    });
-
-    // Select exercises based on goal
-    let selectedExercises: Exercise[] = [];
-    
-    if (workoutGoal === 'muscle_gain' || workoutGoal === 'strength') {
-      selectedExercises = filteredExercises.filter(ex => ex.type === 'strength').slice(0, 4);
-    } else if (workoutGoal === 'fat_loss' || workoutGoal === 'endurance') {
-      selectedExercises = [
-        filteredExercises.find(ex => ex.type === 'cardio') || filteredExercises[4],
-        ...filteredExercises.filter(ex => ex.type === 'strength').slice(0, 3)
-      ];
-    } else {
-      selectedExercises = filteredExercises.slice(0, 4);
-    }
-
-    // Adjust for home vs gym workout
-    if (workoutLocation === 'home') {
-      selectedExercises = selectedExercises.map(exercise => {
-        // Use bodyweight alternatives for home workouts
-        if (exercise.name === 'Bench Press') {
-          return {
-            ...exercise,
-            name: 'Push-ups',
-            sets: 3,
-            reps: 15,
-            description: exercise.alternative.description,
-            commonMistakes: exercise.alternative.commonMistakes
-          };
-        }
-        return exercise;
-      });
-    }
-
-    return selectedExercises;
-  };
+  // Use API data from hook
+  const workouts = (workoutData?.items || []) as any[];
 
   // Get injury advice
   const getInjuryAdvice = () => {
@@ -322,36 +147,16 @@ export default function WorkoutsPage() {
     
     if (injuries.length === 0) return;
     
-    // Sample injury advice - in a real implementation, this would come from a database
-    const injuryAdvicePool: Record<string, InjuryAdvice> = {
-      'knee_pain': {
-        injury: 'Knee Pain',
-        advice: 'Avoid high-impact activities and exercises that put stress on the knees. Focus on low-impact cardio and strengthening exercises for the muscles supporting the knees.',
-        exercises: ['Swimming', 'Cycling', 'Leg Press', 'Hamstring Curls', 'Quadriceps Extensions (with limited range)'],
-        treatments: ['RICE (Rest, Ice, Compression, Elevation)', 'Physical therapy', 'Anti-inflammatory medication'],
-        restrictions: ['Avoid deep squats', 'No high-impact activities', 'Avoid exercises that cause pain']
-      },
-      'back_pain': {
-        injury: 'Back Pain',
-        advice: 'Focus on core strengthening exercises and proper posture. Avoid exercises that put excessive strain on the spine.',
-        exercises: ['Plank', 'Bird Dog', 'Cat-Cow Stretch', 'Glute Bridges', 'Partial Range of Motion Deadlifts'],
-        treatments: ['Heat therapy', 'Gentle stretching', 'Core strengthening exercises', 'Massage therapy'],
-        restrictions: ['Avoid heavy lifting', 'No exercises that round the back', 'Avoid high-impact activities']
-      },
-      'shoulder_pain': {
-        injury: 'Shoulder Pain',
-        advice: 'Focus on exercises that strengthen the rotator cuff and improve shoulder mobility. Avoid overhead pressing movements.',
-        exercises: ['Band Pull-Aparts', 'External Rotation', 'Scaption', 'Wall Slides', 'Pendulum Swings'],
-        treatments: ['Physical therapy', 'Anti-inflammatory medication', 'Heat or ice therapy', 'Rest from aggravating activities'],
-        restrictions: ['Avoid overhead presses', 'No heavy lifting with painful arm', 'Avoid exercises that cause pain']
-      }
-    };
-
-    // Get advice for the first injury
+    // TODO: Load injury advice from API using injuries hook
+    // For now, set a placeholder since mock data was removed
     const firstInjury = injuries[0];
-    if (injuryAdvicePool[firstInjury]) {
-      setInjuryAdvice(injuryAdvicePool[firstInjury]);
-    }
+    setInjuryAdvice({
+      injury: firstInjury,
+      advice: `Please consult with a healthcare professional for advice regarding ${firstInjury}.`,
+      exercises: [],
+      treatments: [],
+      restrictions: []
+    });
   };
 
   // Get complaint solution
@@ -432,6 +237,16 @@ export default function WorkoutsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <h1 className="text-2xl font-bold text-blue-600 mb-6">Workouts and Injuries</h1>
+          {/* Live fetched workouts preview */}
+          <div className="mb-4 p-3 rounded border bg-blue-50">
+            <div className="font-medium text-blue-800">Fetched Workouts Preview</div>
+            {workoutsLoading && <div className="text-blue-700">Loading workouts...</div>}
+            {workoutsError && <div className="text-red-700">{String(workoutsError)}</div>}
+            {workoutData && (
+              <div className="text-sm text-blue-900">{workoutData.items?.length || 0} workouts available</div>
+            )}
+            <button type="button" onClick={() => refetchWorkouts()} className="mt-2 btn-secondary">Refresh Workouts</button>
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -559,50 +374,31 @@ export default function WorkoutsPage() {
             {/* Workout Plan */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-xl font-bold text-blue-600 mb-4">Your Workout Plan</h2>
-              <div className="space-y-4">
-                {workoutPlan.map((exercise, index) => (
-                  <div key={index} className="workout-box">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-gray-800">{exercise.name}</h3>
-                      <div className="text-right text-sm">
-                        <div className="text-gray-600">{exercise.type}</div>
-                        <div>{exercise.sets} sets × {exercise.reps} reps</div>
-                        <div>Rest: {exercise.rest}s</div>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-2">{exercise.description}</p>
-                    
-                    <div className="mb-2">
-                      <h4 className="font-medium text-gray-700">Common Mistakes to Avoid:</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600 ml-4">
-                        {exercise.commonMistakes.map((mistake, i) => (
-                          <li key={i}>{mistake}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div className="border-t pt-2">
-                      <h4 className="font-medium text-gray-700">Alternative Exercise</h4>
-                      <div className="flex justify-between items-start mb-2">
-                        <h5 className="font-medium text-gray-800">{exercise.alternative.name}</h5>
-                        <div className="text-right text-sm">
-                          <div className="text-gray-600">{exercise.alternative.type}</div>
-                          <div>{exercise.alternative.sets} sets × {exercise.alternative.reps} reps</div>
-                          <div>Rest: {exercise.alternative.rest}s</div>
+              {workoutsLoading && <div className="text-center py-8">Loading workouts...</div>}
+              {workoutsError && <div className="text-red-600 py-4">Error loading workouts: {workoutsError}</div>}
+              {!workoutsLoading && !workoutsError && workouts.length === 0 && (
+                <div className="text-center py-8 text-gray-500">No workouts found. Try adjusting your filters.</div>
+              )}
+              {!workoutsLoading && !workoutsError && workouts.length > 0 && (
+                <div className="space-y-4">
+                  {workouts.map((workout: any, index: number) => (
+                    <div key={workout.id || index} className="workout-box">
+                      <h3 className="font-semibold text-gray-800">{workout.name || workout.title || `Workout ${index + 1}`}</h3>
+                      {workout.description && <p className="text-gray-600 mt-2">{workout.description}</p>}
+                      {workout.exercises && (
+                        <div className="mt-4">
+                          <h4 className="font-medium text-gray-700 mb-2">Exercises:</h4>
+                          <ul className="list-disc list-inside text-sm text-gray-600 ml-4">
+                            {Array.isArray(workout.exercises) ? workout.exercises.map((ex: any, i: number) => (
+                              <li key={i}>{ex.name || ex}</li>
+                            )) : <li>{workout.exercises}</li>}
+                          </ul>
                         </div>
-                      </div>
-                      <p className="text-gray-600">{exercise.alternative.description}</p>
-                      
-                      <h4 className="font-medium text-gray-700">Common Mistakes to Avoid:</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-600 ml-4">
-                        {exercise.alternative.commonMistakes.map((mistake, i) => (
-                          <li key={i}>{mistake}</li>
-                        ))}
-                      </ul>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Injury Advice */}
@@ -690,6 +486,30 @@ export default function WorkoutsPage() {
           </p>
         </div>
       </div>
+
+      {/* Pagination Controls */}
+      {workoutsPagination && (
+        <div className="flex justify-between items-center mt-6 px-4">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage <= 1 || workoutsLoading}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 hover:bg-gray-400"
+          >
+            ← Previous
+          </button>
+          <span className="text-sm text-gray-600">
+              Page {workoutsPagination.page} of {workoutsPagination.totalPages}
+            {workoutsPagination.total && ` (${workoutsPagination.total} total workouts)`}
+          </span>
+          <button 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={currentPage >= workoutsPagination.totalPages || workoutsLoading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50 hover:bg-blue-700"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

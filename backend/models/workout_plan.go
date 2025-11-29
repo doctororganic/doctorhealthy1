@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+	"time"
+)
 
 type WorkoutPlan struct {
 	ID            uint                  `json:"id" db:"id"`
@@ -30,12 +35,40 @@ type WorkoutPlanExercise struct {
 	Notes      *string  `json:"notes,omitempty" db:"notes"`
 }
 
-// CompletedExercises represents completed exercises in a workout
-type CompletedExercises struct {
+// CompletedExerciseItem represents a single completed exercise in a workout
+type CompletedExerciseItem struct {
 	ExerciseID  uint      `json:"exercise_id" db:"exercise_id"`
 	Sets        int       `json:"sets" db:"sets"`
 	Reps        int       `json:"reps" db:"reps"`
 	Weight      float64   `json:"weight" db:"weight"`
 	Duration    int       `json:"duration" db:"duration"` // in seconds
 	CompletedAt time.Time `json:"completed_at" db:"completed_at"`
+}
+
+// CompletedExercises represents completed exercises in a workout (array)
+type CompletedExercises []CompletedExerciseItem
+
+// Value implements driver.Valuer for database storage
+func (c CompletedExercises) Value() (driver.Value, error) {
+	if len(c) == 0 {
+		return "[]", nil
+	}
+	return json.Marshal(c)
+}
+
+// Scan implements sql.Scanner for database retrieval
+func (c *CompletedExercises) Scan(value interface{}) error {
+	if value == nil {
+		*c = CompletedExercises{}
+		return nil
+	}
+
+	switch v := value.(type) {
+	case []byte:
+		return json.Unmarshal(v, c)
+	case string:
+		return json.Unmarshal([]byte(v), c)
+	default:
+		return fmt.Errorf("cannot scan %T into CompletedExercises", value)
+	}
 }

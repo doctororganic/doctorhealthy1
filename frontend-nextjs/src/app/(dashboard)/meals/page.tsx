@@ -178,7 +178,17 @@ export default function MealsPage() {
     const mealCalories = calories / 4; // 4 meals
     
     // Sample meal data - in a real implementation, this would come from a database
-    const sampleMeals: Omit<Meal, 'calories' | 'protein' | 'carbs' | 'fat'>[] = [
+    type SampleMeal = {
+      name: string;
+      components: string[];
+      preparation: string;
+      alternative: {
+        name: string;
+        components: string[];
+        preparation: string;
+      };
+    };
+    const sampleMeals: SampleMeal[] = [
       {
         name: 'Grilled Chicken Salad',
         components: ['200g grilled chicken breast', '100g mixed greens', '50g cherry tomatoes', '1 tbsp olive oil'],
@@ -222,7 +232,7 @@ export default function MealsPage() {
     ];
     
     // Calculate nutrition for each meal
-    return sampleMeals.map((meal, index) => {
+    return sampleMeals.map((meal) => {
       // In a real implementation, this would calculate based on the actual ingredients
       // For now, we'll distribute the total nutrition evenly
       const mealCalories = Math.round(calories / 4);
@@ -236,7 +246,14 @@ export default function MealsPage() {
         protein: mealProtein,
         carbs: mealCarbs,
         fat: mealFat,
-      };
+        alternative: {
+          ...meal.alternative,
+          calories: mealCalories,
+          protein: mealProtein,
+          carbs: mealCarbs,
+          fat: mealFat,
+        },
+      } as Meal;
     });
   };
 

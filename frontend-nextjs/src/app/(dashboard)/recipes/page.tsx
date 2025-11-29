@@ -1,6 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useRecipes } from '@/hooks/useNutritionData';
+import { AdvancedSearch } from '@/components/search/AdvancedSearch';
+import { useSearch } from '@/hooks/useSearch';
+import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 // Types
 interface UserProfile {
@@ -89,240 +95,102 @@ export default function RecipesPage() {
   });
 
   const [selectedCountry, setSelectedCountry] = useState<string>('');
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [showRecipes, setShowRecipes] = useState(false);
-  const [loading, setLoading] = useState(false);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data, loading, error, refetch, pagination } = useRecipes({ page: currentPage, limit: 20 });
+  const { query, filters, suggestions, recipes: searchRecipes, isSearching: searchLoading } = useSearch();
 
   // Generate recipes based on selected country and user preferences
   const generateRecipes = () => {
-    setLoading(true);
-    
-    try {
-      // Sample recipes - in a real implementation, this would come from a database
-      const recipePool: Recipe[] = [
-        {
-          id: '1',
-          name: 'Grilled Chicken Salad',
-          cuisine: 'American',
-          dietType: 'balanced',
-          ingredients: ['chicken breast', 'lettuce', 'tomatoes', 'cucumber', 'olive oil', 'lemon juice', 'salt', 'pepper'],
-          instructions: [
-            'Season chicken breast with salt and pepper',
-            'Grill chicken for 6-7 minutes per side',
-            'Let chicken rest for 5 minutes',
-            'Slice chicken into strips',
-            'Combine lettuce, tomatoes, cucumber in a bowl',
-            'Add chicken strips and olive oil',
-            'Toss with lemon juice, salt, and pepper'
-          ],
-          prepTime: 15,
-          cookTime: 15,
-          servings: 2,
-          calories: 350,
-          protein: 35,
-          carbs: 10,
-          fat: 20,
-          isHalal: true,
-          alternatives: [
-            { ingredient: 'chicken breast', halalAlternative: 'halal chicken breast' },
-            { ingredient: 'olive oil', halalAlternative: 'vegetable oil' }
-          ]
-        },
-        {
-          id: '2',
-          name: 'Spaghetti Carbonara',
-          cuisine: 'Italian',
-          dietType: 'balanced',
-          ingredients: ['spaghetti', 'bacon', 'eggs', 'parmesan cheese', 'black pepper', 'salt', 'olive oil'],
-          instructions: [
-            'Cook spaghetti according to package directions',
-            'Cook bacon until crispy',
-            'Beat eggs with Parmesan cheese',
-            'Add hot pasta to egg mixture',
-            'Add bacon and olive oil',
-            'Season with black pepper and salt'
-          ],
-          prepTime: 10,
-          cookTime: 20,
-          servings: 4,
-          calories: 550,
-          protein: 25,
-          carbs: 60,
-          fat: 25,
-          isHalal: false,
-          alternatives: [
-            { ingredient: 'bacon', halalAlternative: 'turkey bacon' },
-            { ingredient: 'parmesan cheese', halalAlternative: 'halal parmesan cheese' }
-          ]
-        },
-        {
-          id: '3',
-          name: 'Chicken Tikka Masala',
-          cuisine: 'Indian',
-          dietType: 'balanced',
-          ingredients: ['chicken', 'yogurt', 'tomatoes', 'onions', 'garlic', 'ginger', 'tikka masala', 'cream', 'rice', 'cilantro'],
-          instructions: [
-            'Marinate chicken in yogurt and tikka masala',
-            'Cook chicken in a pan until golden',
-            'Sauté onions, garlic, and ginger',
-            'Add tomatoes and cook until soft',
-            'Add chicken and cream',
-            'Simmer for 20 minutes',
-            'Garnish with cilantro',
-            'Serve with rice'
-          ],
-          prepTime: 30,
-          cookTime: 30,
-          servings: 4,
-          calories: 450,
-          protein: 35,
-          carbs: 40,
-          fat: 15,
-          isHalal: true,
-          alternatives: [
-            { ingredient: 'cream', halalAlternative: 'coconut cream' }
-          ]
-        },
-        {
-          id: '4',
-          name: 'Sushi Roll',
-          cuisine: 'Japanese',
-          dietType: 'balanced',
-          ingredients: ['sushi rice', 'nori', 'salmon', 'cucumber', 'avocado', 'rice vinegar', 'sugar', 'salt', 'wasabi', 'soy sauce'],
-          instructions: [
-            'Cook sushi rice and season with rice vinegar',
-            'Place nori on bamboo mat',
-            'Spread rice evenly on nori',
-            'Add salmon, cucumber, and avocado',
-            'Roll tightly using bamboo mat',
-            'Cut into 8 pieces',
-            'Serve with wasabi and soy sauce'
-          ],
-          prepTime: 30,
-          cookTime: 10,
-          servings: 2,
-          calories: 300,
-          protein: 20,
-          carbs: 40,
-          fat: 10,
-          isHalal: false,
-          alternatives: [
-            { ingredient: 'salmon', halalAlternative: 'halal salmon' },
-            { ingredient: 'soy sauce', halalAlternative: 'halal soy sauce' }
-          ]
-        },
-        {
-          id: '5',
-          name: 'Mediterranean Quinoa Bowl',
-          cuisine: 'Mediterranean',
-          dietType: 'balanced',
-          ingredients: ['quinoa', 'chickpeas', 'cucumber', 'tomatoes', 'red onion', 'feta cheese', 'olives', 'olive oil', 'lemon juice', 'oregano'],
-          instructions: [
-            'Cook quinoa according to package directions',
-            'Rinse and drain chickpeas',
-            'Chop cucumber, tomatoes, and red onion',
-            'Combine quinoa, chickpeas, and vegetables',
-            'Add feta cheese and olives',
-            'Drizzle with olive oil and lemon juice',
-            'Season with oregano'
-          ],
-          prepTime: 20,
-          cookTime: 15,
-          servings: 2,
-          calories: 420,
-          protein: 15,
-          carbs: 55,
-          fat: 18,
-          isHalal: false,
-          alternatives: [
-            { ingredient: 'feta cheese', halalAlternative: 'halal feta cheese' }
-          ]
-        },
-        {
-          id: '6',
-          name: 'Korean Bibimbap',
-          cuisine: 'Korean',
-          dietType: 'balanced',
-          ingredients: ['rice', 'spinach', 'bean sprouts', 'carrots', 'cucumbers', 'mushrooms', 'egg', 'gochujang', 'sesame oil', 'sesame seeds'],
-          instructions: [
-            'Cook rice according to package directions',
-            'Blanch spinach and bean sprouts',
-            'Julienne carrots and cucumbers',
-            'Slice mushrooms',
-            'Fry egg sunny-side up',
-            'Arrange vegetables over rice',
-            'Top with fried egg',
-            'Serve with gochujang and sesame oil',
-            'Sprinkle with sesame seeds'
-          ],
-          prepTime: 30,
-          cookTime: 20,
-          servings: 2,
-          calories: 480,
-          protein: 18,
-          carbs: 65,
-          fat: 15,
-          isHalal: true,
-          alternatives: []
-        }
-      ];
-
-      // Filter recipes by cuisine
-      const filteredByCuisine = selectedCountry 
-        ? recipePool.filter(recipe => recipe.cuisine === selectedCountry)
-        : recipePool;
-
-      // Filter by diet type
-      const filteredByDiet = filteredByCuisine.filter(recipe => 
-        recipe.dietType === userProfile.dietType
-      );
-
-      // Filter by excluded ingredients
-      const filteredByIngredients = filteredByDiet.filter(recipe => {
-        return !recipe.ingredients.some(ingredient => 
-          userProfile.excludeIngredients.some(excluded => 
-            ingredient.toLowerCase().includes(excluded.toLowerCase())
-          )
-        );
-      });
-
-      // Make recipes halal by substituting haram ingredients
-      const halalRecipes = filteredByIngredients.map(recipe => {
-        let halalRecipe = { ...recipe };
-        let isHalal = true;
-
-        // Check for haram ingredients
-        recipe.ingredients.forEach(ingredient => {
-          const ingredientLower = ingredient.toLowerCase();
-          if (haramIngredients[ingredientLower]) {
-            isHalal = false;
-            
-            // Replace haram ingredient with halal alternative
-            halalRecipe.ingredients = halalRecipe.ingredients.map(ing => {
-              return ing.toLowerCase() === ingredientLower 
-                ? haramIngredients[ingredientLower]
-                : ing;
-            });
-          }
-        });
-
-        // Check diet type for haram ingredients
-        if (userProfile.dietType === 'halal' || !isHalal) {
-          halalRecipe.isHalal = true;
-        }
-
-        return halalRecipe;
-      });
-
-      setRecipes(halalRecipes);
-      setShowRecipes(true);
-    } catch (error) {
-      console.error('Failed to generate recipes:', error);
-    } finally {
-      setLoading(false);
-    }
+    setShowRecipes(true);
+    refetch(); // This loads real data from API
   };
+
+  // Use API data from hook instead of mock data
+  const recipes = (data?.items as Recipe[]) || [];
+
+  // Combine search results with API results
+  const displayRecipesFromSearch = query ? suggestions.filter((r: any) => r.type === 'recipe').map((r: any) => ({
+    id: r.id.replace('recipe-', ''),
+    name: r.text,
+    cuisine: 'Mixed',
+    dietType: 'balanced',
+    ingredients: [],
+    instructions: [],
+    prepTime: 30,
+    cookTime: 30,
+    servings: 4,
+    calories: 400,
+    protein: 25,
+    carbs: 45,
+    fat: 15,
+    isHalal: true,
+    alternatives: []
+  })) : [];
+
+  // Define haram ingredients mapping for halal filtering
+  const haramIngredients: { [key: string]: string } = {
+    bacon: 'turkey bacon',
+    ham: 'turkey ham',
+    pork: 'beef',
+    wine: 'grape juice',
+    beer: 'ginger beer',
+    lard: 'vegetable oil',
+  };
+
+  // Fallback recipes removed - use proper error handling instead
+
+  // Use API data with proper error handling
+  const currentRecipes = recipes.length > 0 ? recipes : [];
+
+  // Filter recipes by cuisine
+  const filteredByCuisine = selectedCountry 
+    ? currentRecipes.filter(recipe => recipe.cuisine === selectedCountry)
+    : currentRecipes;
+
+  // Filter by diet type
+  const filteredByDiet = filteredByCuisine.filter(recipe => 
+    recipe.dietType === userProfile.dietType
+  );
+
+  // Filter by excluded ingredients
+  const filteredByIngredients = filteredByDiet.filter(recipe => {
+    return !recipe.ingredients?.some(ingredient => 
+      userProfile.excludeIngredients.some(excluded => 
+        ingredient.toLowerCase().includes(excluded.toLowerCase())
+      )
+    );
+  });
+
+  // Make recipes halal by substituting haram ingredients
+  const displayRecipes = filteredByIngredients.map(recipe => {
+    let halalRecipe = { ...recipe };
+    let isHalal = true;
+
+    // Check for haram ingredients
+    recipe.ingredients?.forEach(ingredient => {
+      const ingredientLower = ingredient.toLowerCase();
+      if (haramIngredients[ingredientLower]) {
+        isHalal = false;
+        
+        // Replace haram ingredient with halal alternative
+        halalRecipe.ingredients = halalRecipe.ingredients?.map(ing => {
+          return ing.toLowerCase() === ingredientLower 
+            ? haramIngredients[ingredientLower]
+            : ing;
+        });
+      }
+    });
+
+    // Check diet type for haram ingredients
+    if (userProfile.dietType === 'halal' || !isHalal) {
+      halalRecipe.isHalal = true;
+    }
+
+    return halalRecipe;
+  });
 
   // Handle country selection
   const handleCountrySelect = (country: string) => {
@@ -393,9 +261,69 @@ export default function RecipesPage() {
               disabled={loading}
               className="w-full btn-primary"
             >
-              {loading ? 'Generating...' : 'Generate Recipes'}
+              {loading ? 'Loading...' : 'Load Recipes'}
             </button>
+            {error && (
+              <div className="mt-2 p-2 bg-red-50 text-red-700 rounded">{String(error)}</div>
+            )}
           </div>
+        </div>
+        
+        {/* Search Component */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-green-600 mb-4">Search Recipes</h2>
+          <AdvancedSearch 
+            onSearch={(q, f) => {
+              // Search logic handled by useSearch hook
+            }}
+            loading={searchLoading}
+            placeholder="Search recipes by name, ingredient, or cuisine..."
+          />
+          
+          {/* Search Results */}
+          {query && displayRecipesFromSearch.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Search Results</h3>
+              <div className="space-y-4">
+                {displayRecipesFromSearch.map((recipe: Recipe) => (
+                  <div
+                    key={recipe.id}
+                    className="recipe-box cursor-pointer"
+                    onClick={() => setSelectedRecipe(recipe)}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-semibold text-gray-800">{recipe.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <span>{recipe.cuisine}</span>
+                          <span>•</span>
+                          <span>{recipe.dietType.replace('_', ' ')}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {recipe.isHalal && (
+                          <span className="halal-badge">Halal</span>
+                        )}
+                        <div className="text-right text-sm">
+                          <div>{recipe.calories} cal</div>
+                          <div className="text-gray-600">P: {recipe.protein}g | C: {recipe.carbs}g | F: {recipe.fat}g</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {query && displayRecipesFromSearch.length === 0 && !searchLoading && (
+            <div className="mt-6">
+              <EmptyState 
+                title="No recipes found"
+                message="Try adjusting your search terms or filters"
+              />
+            </div>
+          )}
         </div>
         
         {/* Cuisine Selection */}
@@ -434,7 +362,7 @@ export default function RecipesPage() {
             </h2>
             
             <div className="space-y-4">
-              {recipes.map((recipe) => (
+              {displayRecipes.map((recipe) => (
                 <div
                   key={recipe.id}
                   className="recipe-box cursor-pointer"
@@ -562,6 +490,36 @@ export default function RecipesPage() {
           </p>
         </div>
       </div>
+
+      {/* Pagination Controls */}
+      {pagination && (
+        <div className="flex justify-between items-center mt-8 px-4">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage <= 1 || loading}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50 hover:bg-gray-400"
+          >
+            ← Previous
+          </button>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            {pagination.total && (
+              <span className="text-xs text-gray-500">
+                ({pagination.total} recipes)
+              </span>
+            )}
+          </div>
+          <button 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            disabled={currentPage >= pagination.totalPages || loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50 hover:bg-blue-700"
+          >
+            Next →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

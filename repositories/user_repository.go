@@ -3,12 +3,9 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	"nutrition-platform/database"
 	"nutrition-platform/models"
-
-	"github.com/lib/pq"
 )
 
 // UserRepository handles user-related database operations
@@ -28,7 +25,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.db.QueryRow(query,
 		user.Email,
 		user.PasswordHash,
@@ -38,11 +35,11 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 		user.IsVerified,
 		user.IsActive,
 	).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -54,7 +51,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 		FROM users
 		WHERE email = $1 AND is_active = true
 	`
-	
+
 	user := &models.User{}
 	err := r.db.QueryRow(query, email).Scan(
 		&user.ID,
@@ -69,14 +66,14 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
-	
+
 	return user, nil
 }
 
@@ -88,7 +85,7 @@ func (r *UserRepository) GetUserByID(id uint) (*models.User, error) {
 		FROM users
 		WHERE id = $1 AND is_active = true
 	`
-	
+
 	user := &models.User{}
 	err := r.db.QueryRow(query, id).Scan(
 		&user.ID,
@@ -103,14 +100,14 @@ func (r *UserRepository) GetUserByID(id uint) (*models.User, error) {
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user not found")
 		}
 		return nil, fmt.Errorf("failed to get user by ID: %w", err)
 	}
-	
+
 	return user, nil
 }
 
@@ -121,21 +118,21 @@ func (r *UserRepository) UpdateUser(user *models.User) error {
 		SET first_name = $2, last_name = $3, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	
+
 	result, err := r.db.Exec(query, user.ID, user.FirstName, user.LastName)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("user not found")
 	}
-	
+
 	return nil
 }
 
@@ -146,12 +143,12 @@ func (r *UserRepository) UpdateLastLogin(userID uint) error {
 		SET last_login = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	
+
 	_, err := r.db.Exec(query, userID)
 	if err != nil {
 		return fmt.Errorf("failed to update last login: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -162,21 +159,21 @@ func (r *UserRepository) UpdatePassword(userID uint, passwordHash string) error 
 		SET password_hash = $2, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	
+
 	result, err := r.db.Exec(query, userID, passwordHash)
 	if err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("user not found")
 	}
-	
+
 	return nil
 }
 
@@ -187,21 +184,21 @@ func (r *UserRepository) DeactivateUser(userID uint) error {
 		SET is_active = false, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	
+
 	result, err := r.db.Exec(query, userID)
 	if err != nil {
 		return fmt.Errorf("failed to deactivate user: %w", err)
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("user not found")
 	}
-	
+
 	return nil
 }
 
@@ -212,21 +209,21 @@ func (r *UserRepository) VerifyEmail(userID uint) error {
 		SET is_verified = true, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $1
 	`
-	
+
 	result, err := r.db.Exec(query, userID)
 	if err != nil {
 		return fmt.Errorf("failed to verify email: %w", err)
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("user not found")
 	}
-	
+
 	return nil
 }
 
@@ -239,7 +236,7 @@ func (r *UserRepository) GetUserProfile(userID uint) (*models.UserProfile, error
 		FROM user_profiles
 		WHERE user_id = $1
 	`
-	
+
 	profile := &models.UserProfile{}
 	err := r.db.QueryRow(query, userID).Scan(
 		&profile.ID,
@@ -256,14 +253,14 @@ func (r *UserRepository) GetUserProfile(userID uint) (*models.UserProfile, error
 		&profile.CreatedAt,
 		&profile.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user profile not found")
 		}
 		return nil, fmt.Errorf("failed to get user profile: %w", err)
 	}
-	
+
 	return profile, nil
 }
 
@@ -276,7 +273,7 @@ func (r *UserRepository) CreateUserProfile(profile *models.UserProfile) error {
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.db.QueryRow(query,
 		profile.UserID,
 		profile.DateOfBirth,
@@ -289,11 +286,11 @@ func (r *UserRepository) CreateUserProfile(profile *models.UserProfile) error {
 		profile.Allergies,
 		profile.PreferredUnits,
 	).Scan(&profile.ID, &profile.CreatedAt, &profile.UpdatedAt)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create user profile: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -306,7 +303,7 @@ func (r *UserRepository) UpdateUserProfile(profile *models.UserProfile) error {
 		    allergies = $9, preferred_units = $10, updated_at = CURRENT_TIMESTAMP
 		WHERE user_id = $1
 	`
-	
+
 	result, err := r.db.Exec(query,
 		profile.UserID,
 		profile.DateOfBirth,
@@ -319,20 +316,20 @@ func (r *UserRepository) UpdateUserProfile(profile *models.UserProfile) error {
 		profile.Allergies,
 		profile.PreferredUnits,
 	)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to update user profile: %w", err)
 	}
-	
+
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
-	
+
 	if rowsAffected == 0 {
 		return fmt.Errorf("user profile not found")
 	}
-	
+
 	return nil
 }
 
@@ -345,7 +342,7 @@ func (r *UserRepository) GetUserPreferences(userID uint) (*models.UserPreference
 		FROM user_preferences
 		WHERE user_id = $1
 	`
-	
+
 	prefs := &models.UserPreferences{}
 	err := r.db.QueryRow(query, userID).Scan(
 		&prefs.ID,
@@ -360,7 +357,7 @@ func (r *UserRepository) GetUserPreferences(userID uint) (*models.UserPreference
 		&prefs.CreatedAt,
 		&prefs.UpdatedAt,
 	)
-	
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Return default preferences if none found
@@ -377,7 +374,7 @@ func (r *UserRepository) GetUserPreferences(userID uint) (*models.UserPreference
 		}
 		return nil, fmt.Errorf("failed to get user preferences: %w", err)
 	}
-	
+
 	return prefs, nil
 }
 
@@ -399,7 +396,7 @@ func (r *UserRepository) CreateOrUpdateUserPreferences(prefs *models.UserPrefere
 			updated_at = CURRENT_TIMESTAMP
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.db.QueryRow(query,
 		prefs.UserID,
 		prefs.Language,
@@ -410,11 +407,11 @@ func (r *UserRepository) CreateOrUpdateUserPreferences(prefs *models.UserPrefere
 		prefs.Units,
 		prefs.DarkMode,
 	).Scan(&prefs.ID, &prefs.CreatedAt, &prefs.UpdatedAt)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create/update user preferences: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -428,13 +425,13 @@ func (r *UserRepository) GetActiveNutritionGoals(userID uint) ([]*models.Nutriti
 		WHERE user_id = $1 AND is_active = true
 		ORDER BY created_at DESC
 	`
-	
+
 	rows, err := r.db.Query(query, userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get nutrition goals: %w", err)
 	}
 	defer rows.Close()
-	
+
 	var goals []*models.NutritionGoal
 	for rows.Next() {
 		goal := &models.NutritionGoal{}
@@ -460,7 +457,7 @@ func (r *UserRepository) GetActiveNutritionGoals(userID uint) ([]*models.Nutriti
 		}
 		goals = append(goals, goal)
 	}
-	
+
 	return goals, nil
 }
 
@@ -468,12 +465,12 @@ func (r *UserRepository) GetActiveNutritionGoals(userID uint) ([]*models.Nutriti
 func (r *UserRepository) CreateNutritionGoal(goal *models.NutritionGoal) error {
 	query := `
 		INSERT INTO nutrition_goals (user_id, daily_calories, protein_grams, carbs_grams,
-		                            fat_grams, fiber_grams, sugar_grams, sodium_mg, water_ml,
-		                            is_active, start_date, end_date)
+		                    fat_grams, fiber_grams, sugar_grams, sodium_mg, water_ml,
+		                    is_active, start_date, end_date)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.db.QueryRow(query,
 		goal.UserID,
 		goal.DailyCalories,
@@ -488,18 +485,78 @@ func (r *UserRepository) CreateNutritionGoal(goal *models.NutritionGoal) error {
 		goal.StartDate,
 		goal.EndDate,
 	).Scan(&goal.ID, &goal.CreatedAt, &goal.UpdatedAt)
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to create nutrition goal: %w", err)
 	}
-	
+
+	return nil
+}
+
+// UpdateNutritionGoal updates an existing nutrition goal
+func (r *UserRepository) UpdateNutritionGoal(goal *models.NutritionGoal) error {
+	query := `
+		UPDATE nutrition_goals 
+		SET daily_calories = $2, protein_grams = $3, carbs_grams = $4,
+		    fat_grams = $5, fiber_grams = $6, sugar_grams = $7, sodium_mg = $8,
+		    water_ml = $9, is_active = $10, start_date = $11, end_date = $12,
+		    updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1 AND user_id = $13
+		RETURNING updated_at
+	`
+
+	err := r.db.QueryRow(query,
+		goal.ID,
+		goal.DailyCalories,
+		goal.ProteinGrams,
+		goal.CarbsGrams,
+		goal.FatGrams,
+		goal.FiberGrams,
+		goal.SugarGrams,
+		goal.SodiumMg,
+		goal.WaterMl,
+		goal.IsActive,
+		goal.StartDate,
+		goal.EndDate,
+		goal.UserID,
+	).Scan(&goal.UpdatedAt)
+
+	if err != nil {
+		return fmt.Errorf("failed to update nutrition goal: %w", err)
+	}
+
+	return nil
+}
+
+// DeleteNutritionGoal deletes (deactivates) a nutrition goal
+func (r *UserRepository) DeleteNutritionGoal(goalID, userID uint) error {
+	query := `
+		UPDATE nutrition_goals 
+		SET is_active = false, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $1 AND user_id = $2
+	`
+
+	result, err := r.db.Exec(query, goalID, userID)
+	if err != nil {
+		return fmt.Errorf("failed to delete nutrition goal: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("nutrition goal not found")
+	}
+
 	return nil
 }
 
 // GetUsers retrieves users with pagination
 func (r *UserRepository) GetUsers(page, perPage int) ([]*models.User, int64, error) {
 	offset := (page - 1) * perPage
-	
+
 	// Get total count
 	var total int64
 	countQuery := "SELECT COUNT(*) FROM users WHERE is_active = true"
@@ -507,7 +564,7 @@ func (r *UserRepository) GetUsers(page, perPage int) ([]*models.User, int64, err
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get users count: %w", err)
 	}
-	
+
 	// Get users
 	query := `
 		SELECT id, email, password_hash, first_name, last_name, role,
@@ -517,13 +574,13 @@ func (r *UserRepository) GetUsers(page, perPage int) ([]*models.User, int64, err
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
 	`
-	
+
 	rows, err := r.db.Query(query, perPage, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get users: %w", err)
 	}
 	defer rows.Close()
-	
+
 	var users []*models.User
 	for rows.Next() {
 		user := &models.User{}
@@ -545,7 +602,7 @@ func (r *UserRepository) GetUsers(page, perPage int) ([]*models.User, int64, err
 		}
 		users = append(users, user)
 	}
-	
+
 	return users, total, nil
 }
 
@@ -553,7 +610,7 @@ func (r *UserRepository) GetUsers(page, perPage int) ([]*models.User, int64, err
 func (r *UserRepository) SearchUsers(search string, page, perPage int) ([]*models.User, int64, error) {
 	offset := (page - 1) * perPage
 	searchPattern := "%" + search + "%"
-	
+
 	// Get total count
 	var total int64
 	countQuery := `
@@ -565,7 +622,7 @@ func (r *UserRepository) SearchUsers(search string, page, perPage int) ([]*model
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to get users count: %w", err)
 	}
-	
+
 	// Get users
 	query := `
 		SELECT id, email, password_hash, first_name, last_name, role,
@@ -576,13 +633,13 @@ func (r *UserRepository) SearchUsers(search string, page, perPage int) ([]*model
 		ORDER BY created_at DESC
 		LIMIT $2 OFFSET $3
 	`
-	
+
 	rows, err := r.db.Query(query, searchPattern, perPage, offset)
 	if err != nil {
 		return nil, 0, fmt.Errorf("failed to search users: %w", err)
 	}
 	defer rows.Close()
-	
+
 	var users []*models.User
 	for rows.Next() {
 		user := &models.User{}
@@ -604,6 +661,6 @@ func (r *UserRepository) SearchUsers(search string, page, perPage int) ([]*model
 		}
 		users = append(users, user)
 	}
-	
+
 	return users, total, nil
 }

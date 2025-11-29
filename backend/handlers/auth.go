@@ -248,9 +248,30 @@ func LogoutAll(c echo.Context) error {
 
 // GetProfile returns the current user's profile
 func (h *AuthHandler) GetProfile(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "GetProfile - stub implementation",
-	})
+	// Get user ID from context (set by JWT middleware)
+	userID := c.Get("user_id")
+	if userID == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Stub implementation - in production, fetch from database
+	user := map[string]interface{}{
+		"id":         userID,
+		"email":      "user@example.com",
+		"first_name": "User",
+		"last_name":  "Name",
+		"role":       "user",
+		"created_at": "2024-01-01T00:00:00Z",
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
+// GetMe is an alias for GetProfile (frontend expects /auth/me)
+func (h *AuthHandler) GetMe(c echo.Context) error {
+	return h.GetProfile(c)
 }
 
 // GetSessions returns the current user's active sessions
@@ -306,5 +327,79 @@ func (h *AuthHandler) DeleteUser(c echo.Context) error {
 func (h *AuthHandler) GetAuditLogs(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "GetAuditLogs - stub implementation",
+	})
+}
+
+// ForgotPassword handles password reset request
+func (h *AuthHandler) ForgotPassword(c echo.Context) error {
+	var req struct {
+		Email string `json:"email" validate:"required,email"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request format",
+		})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Validation failed: " + err.Error(),
+		})
+	}
+
+	// Stub implementation - in production:
+	// 1. Check if user exists
+	// 2. Generate reset token
+	// 3. Store token with expiration
+	// 4. Send email with reset link
+	// 5. Return success (don't reveal if email exists)
+
+	fmt.Printf("Forgot password request for: %s\n", req.Email)
+
+	// Always return success to prevent email enumeration
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "If an account with that email exists, a password reset link has been sent",
+	})
+}
+
+// ResetPassword handles password reset with token
+func (h *AuthHandler) ResetPassword(c echo.Context) error {
+	var req struct {
+		Token       string `json:"token" validate:"required"`
+		NewPassword string `json:"new_password" validate:"required,min=6"`
+	}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request format",
+		})
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Validation failed: " + err.Error(),
+		})
+	}
+
+	// Stub implementation - in production:
+	// 1. Validate reset token
+	// 2. Check token expiration
+	// 3. Hash new password
+	// 4. Update user password
+	// 5. Invalidate reset token
+	// 6. Invalidate all user sessions
+
+	fmt.Printf("Reset password with token: %s...\n", req.Token[:10]+"...")
+
+	// Check if token is valid (stub - always valid for testing)
+	if len(req.Token) < 10 {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid or expired reset token",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"message": "Password reset successfully",
 	})
 }

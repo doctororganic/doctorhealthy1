@@ -1,0 +1,195 @@
+#!/bin/sh
+# Pre-commit hook to enforce file locking system
+# This hook prevents commits to locked files without proper authorization
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Locks directory
+LOCKS_DIR=".locks"
+LOCK_EXTENSION=".lock"
+
+# High-risk files that require locking
+HIGH_RISK_FILES=(
+    "backend/main.go"
+    "backend/config.go"
+    "backend/database/database.go"
+    "backend/security.go"
+    "frontend-nextjs/src/app/layout.tsx"
+    "frontend-nextjs/src/lib/api.ts"
+    "go.mod"
+    "frontend-nextjs/package.json"
+    "Makefile"
+)
+
+# Function to check if a file is locked
+is_file_locked() {
+    local file="$1"
+    local lock_file="$LOCKS_DIR/${file}${LOCK_EXTENSION}"
+    
+    if [ -f "$lock_file" ]; then
+        return 0  # Locked
+    else
+        return 1  # Not locked
+    fi
+}
+
+# Function to get lock details
+get_lock_details() {
+    local file="$1"
+    local lock_file="$LOCKS_DIR/${file}${LOCK_EXTENSION}"
+    
+    if [ -f "$lock_file" ]; then
+        cat "$lock_file"
+    fi
+}
+
+# Function to check if file is in high-risk list
+is_high_risk_file() {
+    local file="$1"
+    
+    for high_risk_file in "${HIGH_RISK_FILES[@]}"; do
+        if [ "$file" = "$high_risk_file" ]; then
+            return 0  # High risk
+        fi
+    done
+    
+    return 1  # Not high risk
+}
+
+# Function to normalize file path
+normalize_file_path() {
+    local file="$1"
+    
+    # Remove leading ./
+    file="${file#./}"
+    
+    # Convert to forward slashes if on Windows
+    file=$(echo "$file" | sed 's|\\|/|g')
+    
+    echo "$file"
+}
+
+echo -e "${BLUE}🔒 Checking file locks...${NC}"
+
+# Get staged files
+staged_files=$(git diff --cached --name-only)
+
+if [ -z "$staged_files" ]; then
+    echo -e "${GREEN}✅ No staged files to check${NC}"
+    exit 0
+fi
+
+# Track if we found any issues
+has_issues=false
+
+# Check each staged file
+for file in $staged_files; do
+    # Normalize file path
+    normalized_file=$(normalize_file_path "$file")
+    
+    # Check if it's a high-risk file
+    if is_high_risk_file "$normalized_file"; then
+        # Check if file is locked
+        if is_file_locked "$normalized_file"; then
+            lock_details=$(get_lock_details "$normalized_file")
+            dev_id=$(echo "$lock_details" | cut -d':' -f1)
+            
+            # Get current developer ID from environment or prompt
+            current_dev_id="${GIT_AUTHOR_EMAIL%%@*}"
+            current_dev_id="${current_dev_id//[^a-zA-Z0-9]/}"
+            current_dev_id=$(echo "$current_dev_id" | tr '[:lower:]' '[:upper:]')
+            
+            # If developer ID is not set, try to get from git config
+            if [ -z "$current_dev_id" ]; then
+                current_dev_id=$(git config user.email | cut -d'@' -f1)
+                current_dev_id="${current_dev_id//[^a-zA-Z0-9]/}"
+                current_dev_id=$(echo "$current_dev_id" | tr '[:lower:]' '[:upper:]')
+            fi
+            
+            # Check if current developer owns the lock
+            if [ "$current_dev_id" = "$dev_id" ]; then
+                echo -e "${GREEN}✅ $normalized_file (locked by you: $lock_details)${NC}"
+            else
+                echo -e "${RED}❌ $normalized_file is locked by another developer${NC}"
+                echo -e "${YELLOW}   Lock details: $lock_details${NC}"
+                echo -e "${YELLOW}   Your ID: $current_dev_id${NC}"
+                echo -e "${YELLOW}   To proceed, either:${NC}"
+                echo -e "${YELLOW}   1. Ask $dev_id to unlock the file, or${NC}"
+                echo -e "${YELLOW}   2. Wait for the lock to be removed${NC}"
+                has_issues=true
+            fi
+        else
+            echo -e "${YELLOW}⚠️  $normalized_file is a high-risk file but not locked${NC}"
+            echo -e "${YELLOW}   Consider locking it with: ./scripts/manage-locks.sh lock \"$normalized_file\" \"YOUR_ID\" \"Description\" \"ETA\"${NC}"
+            
+            # For now, we'll warn but allow the commit
+            # In a stricter environment, you might want to set has_issues=true here
+        fi
+    fi
+done
+
+# Check for middleware files specifically
+for file in $staged_files; do
+    normalized_file=$(normalize_file_path "$file")
+    
+    # Check if it's a middleware file
+    if [[ "$normalized_file" == backend/middleware/*.go ]]; then
+        if is_file_locked "$normalized_file"; then
+            lock_details=$(get_lock_details "$normalized_file")
+            dev_id=$(echo "$lock_details" | cut -d':' -f1)
+            
+            current_dev_id="${GIT_AUTHOR_EMAIL%%@*}"
+            current_dev_id="${current_dev_id//[^a-zA-Z0-9]/}"
+            current_dev_id=$(echo "$current_dev_id" | tr '[:lower:]' '[:upper:]')
+            
+            if [ "$current_dev_id" != "$dev_id" ]; then
+                echo -e "${RED}❌ $normalized_file is locked by another developer${NC}"
+                echo -e "${YELLOW}   Lock details: $lock_details${NC}"
+                has_issues=true
+            else
+                echo -e "${GREEN}✅ $normalized_file (locked by you: $lock_details)${NC}"
+            fi
+        else
+            echo -e "${YELLOW}⚠️  $normalized_file is a middleware file but not locked${NC}"
+            echo -e "${YELLOW}   Consider locking it with: ./scripts/manage-locks.sh lock \"$normalized_file\" \"YOUR_ID\" \"Description\" \"ETA\"${NC}"
+        fi
+    fi
+done
+
+# Check for stale locks and warn
+echo -e "${BLUE}🔍 Checking for stale locks...${NC}"
+for lock_file in "$LOCKS_DIR"/*"$LOCK_EXTENSION"; do
+    if [ -f "$lock_file" ]; then
+        lock_time=$(stat -c %Y "$lock_file" 2>/dev/null || stat -f %m "$lock_file" 2>/dev/null)
+        current_time=$(date +%s)
+        age=$((current_time - lock_time))
+        stale_age=$((24 * 3600)) # 24 hours
+        
+        if [ $age -gt $stale_age ]; then
+            file_name=$(basename "$lock_file" "$LOCK_EXTENSION")
+            lock_content=$(cat "$lock_file")
+            age_hours=$((age / 3600))
+            
+            echo -e "${YELLOW}⚠️  Stale lock detected: $file_name (${age_hours}h old)${NC}"
+            echo -e "${YELLOW}   Details: $lock_content${NC}"
+            echo -e "${YELLOW}   Consider cleaning with: ./scripts/manage-locks.sh clean${NC}"
+        fi
+    fi
+done
+
+# Final result
+if [ "$has_issues" = true ]; then
+    echo ""
+    echo -e "${RED}❌ Commit blocked due to file lock conflicts${NC}"
+    echo -e "${YELLOW}Please resolve the conflicts and try again${NC}"
+    echo -e "${YELLOW}Use './scripts/manage-locks.sh check' to see all active locks${NC}"
+    exit 1
+else
+    echo -e "${GREEN}✅ No lock conflicts detected${NC}"
+    exit 0
+fi

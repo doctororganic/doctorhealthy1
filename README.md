@@ -1,69 +1,48 @@
-# 🍎 Nutrition Platform
+# Nutrition Platform
 
-AI-powered nutrition and health management platform.
+A comprehensive nutrition and fitness platform with backend API and frontend dashboard.
 
-## Quick Start
+## 🚀 Quick Start
 
-```bash
-# Start everything
-docker-compose up -d
-
-# Or use deployment script
-./deploy.sh
-```
-
-## Services
-
-- **Backend:** Go API on port 8080
-- **Frontend:** Next.js on port 3000
-- **Database:** PostgreSQL on port 5432
-- **Cache:** Redis on port 6379
-
-## Development
-
-### Backend (Go)
+### Backend
 ```bash
 cd backend
-go run main.go
+go build -o bin/server .
+./bin/server
 ```
 
-### Frontend (Next.js)
+### Frontend
 ```bash
 cd frontend-nextjs
 npm install
 npm run dev
 ```
 
-## API Endpoints
+## 📋 Prerequisites
 
-- `GET /health` - Health check
-- `GET /api/v1/info` - API information
-- `POST /api/v1/nutrition/analyze` - Nutrition analysis
-- `GET /api/v1/recipes` - Recipe management
-- `GET /api/v1/workouts` - Workout plans
-- `POST /api/v1/generate-meal-plan` - Meal plan generation
+- Go 1.24+
+- Node.js 18+
+- PostgreSQL (optional, SQLite supported)
+- Redis (optional, in-memory fallback)
 
-## Documentation
+## 🔐 Environment Variables
 
-- [Backend README](backend/README.md)
-- [API Documentation](backend/docs/)
-- [Deployment Guide](DEPLOYMENT.md)
+Copy `.env.example` files and configure:
+- `backend/.env.example` → `backend/.env`
+- `frontend-nextjs/.env.example` → `frontend-nextjs/.env.local`
 
-## Architecture
+## 📚 Documentation
 
-```
-┌─────────────┐      ┌─────────────┐
-│   Next.js   │─────▶│   Go API    │
-│  Frontend   │      │   Backend   │
-└─────────────┘      └─────────────┘
-                            │
-                     ┌──────┴──────┐
-                     ▼              ▼
-              ┌───────────┐  ┌──────────┐
-              │ PostgreSQL│  │  Redis   │
-              └───────────┘  └──────────┘
-```
+- [Deployment Guide](30_MINUTE_DEPLOYMENT_GUIDE.md)
+- [Production Status](PRODUCTION_STATUS.md)
+- [API Documentation](docs/API_REFERENCE.md)
 
-## License
+## 🔒 Security
 
-MIT
+- Never commit `.env` files
+- Use environment variables for secrets
+- See [SECURITY.md](.github/SECURITY.md) for details
+
+## 📝 License
+
+[Your License Here]

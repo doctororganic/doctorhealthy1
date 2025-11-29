@@ -6,25 +6,31 @@ import (
 
 // Food represents a food item in the system
 type Food struct {
-	ID          uint      `json:"id" db:"id"`
-	Name        string    `json:"name" db:"name"`
-	Description *string   `json:"description" db:"description"`
-	Brand       *string   `json:"brand" db:"brand"`
-	Barcode     *string   `json:"barcode" db:"barcode"`
-	Category    *string   `json:"category" db:"category"`
-	Calories    float64   `json:"calories" db:"calories"`
-	Protein     float64   `json:"protein" db:"protein"`
-	Carbs       float64   `json:"carbs" db:"carbs"`
-	Fat         float64   `json:"fat" db:"fat"`
-	Fiber       float64   `json:"fiber" db:"fiber"`
-	Sugar       float64   `json:"sugar" db:"sugar"`
-	Sodium      int       `json:"sodium" db:"sodium"`
-	ServingSize string    `json:"serving_size" db:"serving_size"`
-	ServingUnit string    `json:"serving_unit" db:"serving_unit"`
-	UserID      *uint     `json:"user_id" db:"user_id"`
-	IsVerified  bool      `json:"is_verified" db:"is_verified"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	ID           uint      `json:"id" db:"id"`
+	Name         string    `json:"name" db:"name"`
+	Description  *string   `json:"description" db:"description"`
+	Brand        *string   `json:"brand" db:"brand"`
+	Barcode      *string   `json:"barcode" db:"barcode"`
+	BarCode      *string   `json:"bar_code" db:"bar_code"` // Alias for repository compatibility
+	Category     *string   `json:"category" db:"category"`
+	Calories     float64   `json:"calories" db:"calories"`
+	Protein      float64   `json:"protein" db:"protein"`
+	Carbs        float64   `json:"carbs" db:"carbs"`
+	Fat          float64   `json:"fat" db:"fat"`
+	SaturatedFat float64   `json:"saturated_fat" db:"saturated_fat"`
+	Fiber        float64   `json:"fiber" db:"fiber"`
+	Sugar        float64   `json:"sugar" db:"sugar"`
+	Sodium       int       `json:"sodium" db:"sodium"`
+	Cholesterol  float64   `json:"cholesterol" db:"cholesterol"`
+	Potassium    float64   `json:"potassium" db:"potassium"`
+	ServingSize  string    `json:"serving_size" db:"serving_size"`
+	ServingUnit  string    `json:"serving_unit" db:"serving_unit"`
+	UserID       *uint     `json:"user_id" db:"user_id"`
+	SourceType   string    `json:"source_type" db:"source_type"`
+	IsVerified   bool      `json:"is_verified" db:"is_verified"`
+	Verified     bool      `json:"verified" db:"verified"` // Alias for repository compatibility
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // Recipe represents a recipe that combines multiple foods
@@ -278,6 +284,15 @@ type SearchParams struct {
 	Category string `query:"category"`
 	UserOnly bool   `query:"user_only"`
 	Verified bool   `query:"verified"`
+}
+
+// FoodSearchFilters represents filters for food search
+type FoodSearchFilters struct {
+	Brand         string  `json:"brand"`
+	SourceType    string  `json:"source_type"`
+	Verified      *bool   `json:"verified"`
+	SortBy        string  `json:"sort_by"`
+	SortDirection string  `json:"sort_direction"`
 }
 
 // FoodLogQueryParams represents food log query parameters

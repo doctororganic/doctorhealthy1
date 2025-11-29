@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	// Load configuration
-	cfg := config.Load()
+	cfg := config.LoadConfig()
 
 	// Connect to database
 	db, err := sql.Open("postgres", cfg.GetDatabaseURL())

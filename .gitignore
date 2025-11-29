@@ -154,10 +154,19 @@ dev/
 development/
 
 # Go
-*.mod
-*.sum
-go.sum
+# Note: go.mod and go.sum should be committed for dependency management
+# *.mod
+# *.sum
+# go.sum
 vendor/
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
 
 # Node modules (prevent Go from scanning them)
 node_modules/
@@ -176,3 +185,22 @@ secrets/
 *.pem
 .env.coolify
 COOLIFY-CREDENTIALS-SECURE.md
+
+# Backend specific
+backend/bin/
+backend/*.log
+backend/data/
+backend/*.db
+backend/*.sqlite
+/tmp/
+/tmp/server.log
+
+# Frontend specific
+frontend-nextjs/.next/
+frontend-nextjs/out/
+frontend-nextjs/.env.local
+frontend-nextjs/.env.production.local
+
+# Test files (optional - remove if you want to commit tests)
+test-file.go
+main.go
