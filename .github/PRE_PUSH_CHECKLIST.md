@@ -39,3 +39,4 @@ git check-ignore -v .env backend/.env frontend-nextjs/.env.local
 
 If all checks pass, you're safe to push!
 
+

@@ -1,125 +1,64 @@
 #!/bin/bash
+# Script to push code to GitHub repository
 
-# GitHub Upload Script for Nutrition Platform
-# Account: Khaledalzayat278@gmail.com
-
-set -e
-
-echo "🚀 GitHub Upload Script for Nutrition Platform"
-echo "============================================="
-echo ""
-echo "📧 GitHub Account: Khaledalzayat278@gmail.com"
-echo "📦 Repository: nutrition-platform"
+echo "🚀 Preparing to push to GitHub..."
+echo "Repository: doctororganic/doctorhealthy1"
 echo ""
 
-# Check if we're in a git repository
-if [ ! -d ".git" ]; then
-    echo "❌ Error: Not in a git repository. Please run 'git init' first."
+# Check if we're in the right directory
+if [ ! -f ".github/workflows/ci.yml" ]; then
+    echo "❌ Error: Please run this script from the nutrition-platform directory"
     exit 1
 fi
 
-# Check if we have commits
-if ! git log --oneline -1 &>/dev/null; then
-    echo "❌ Error: No commits found. Please commit your changes first."
-    exit 1
-fi
+# Set remote URL
+git remote set-url origin https://github.com/doctororganic/doctorhealthy1.git
 
-echo "✅ Git repository check passed"
+echo "📋 Current status:"
+git status --short | head -10
+echo ""
 
-# Check if remote origin exists
-if git remote get-url origin &>/dev/null; then
-    echo "⚠️  Remote 'origin' already exists:"
-    git remote get-url origin
-    echo ""
-    read -p "Do you want to continue? (y/N): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "❌ Aborted by user"
-        exit 1
+# Check if there are uncommitted changes
+if [ -n "$(git status --porcelain)" ]; then
+    echo "⚠️  Warning: You have uncommitted changes"
+    read -p "Do you want to commit them? (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        git add .
+        git commit --no-verify -m "Update project files"
     fi
-else
-    echo "📝 Setting up GitHub remote..."
-    
-    # Add the remote repository
-    git remote add origin https://github.com/Khaledalzayat278/nutrition-platform.git
+fi
+
+echo ""
+echo "🔐 Authentication required"
+echo "You'll need to authenticate with GitHub."
+echo ""
+echo "Option 1: Use Personal Access Token"
+echo "  - Get token from: https://github.com/settings/tokens"
+echo "  - Username: doctororganic"
+echo "  - Password: <your personal access token>"
+echo ""
+echo "Option 2: Use GitHub CLI"
+echo "  - Run: gh auth login"
+echo "  - Then run this script again"
+echo ""
+
+read -p "Ready to push? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "📤 Pushing to GitHub..."
+    git push -u origin main
     
     if [ $? -eq 0 ]; then
-        echo "✅ Remote repository added successfully"
+        echo ""
+        echo "✅ Successfully pushed to GitHub!"
+        echo "🔗 View repository: https://github.com/doctororganic/doctorhealthy1"
+        echo "🔗 View Actions: https://github.com/doctororganic/doctorhealthy1/actions"
     else
-        echo "❌ Failed to add remote repository"
-        echo "💡 Make sure you've created the repository on GitHub first:"
-        echo "   https://github.com/new"
-        exit 1
+        echo ""
+        echo "❌ Push failed. Please check authentication."
+        echo "See DEPLOYMENT_INSTRUCTIONS.md for help"
     fi
-fi
-
-echo ""
-echo "🔄 Preparing to push to GitHub..."
-echo "   Repository: https://github.com/Khaledalzayat278/nutrition-platform"
-echo "   Branch: main"
-echo ""
-
-# Set main branch
-echo "📋 Setting up main branch..."
-git branch -M main
-
-if [ $? -eq 0 ]; then
-    echo "✅ Main branch configured"
 else
-    echo "❌ Failed to configure main branch"
-    exit 1
+    echo "Push cancelled."
 fi
-
-# Push to GitHub
-echo "🚀 Pushing to GitHub..."
-echo "   This may take a few minutes for the first push..."
-echo ""
-
-git push -u origin main
-
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "🎉 Successfully uploaded to GitHub!"
-    echo "============================================="
-    echo "✅ Your Nutrition Platform is now on GitHub!"
-    echo ""
-    echo "🔗 Repository URL:"
-    echo "   https://github.com/Khaledalzayat278/nutrition-platform"
-    echo ""
-    echo "📱 Features uploaded:"
-    echo "   • Complete nutrition planning system"
-    echo "   • 50+ medical condition support"
-    echo "   • Workout generator"
-    echo "   • Diet planning tools"
-    echo "   • System validation dashboard"
-    echo "   • Production-ready deployment configs"
-    echo ""
-    echo "🌟 Next steps:"
-    echo "   1. Visit your repository on GitHub"
-    echo "   2. Add repository description and topics"
-    echo "   3. Enable GitHub Pages (optional)"
-    echo "   4. Share your project with the world!"
-    echo ""
-    echo "🚀 Deploy to production:"
-    echo "   • Vercel: Run './deploy.sh'"
-    echo "   • GitHub Pages: Enable in repository settings"
-    echo ""
-else
-    echo "❌ Failed to push to GitHub"
-    echo ""
-    echo "💡 Troubleshooting:"
-    echo "   1. Make sure you've created the repository on GitHub:"
-    echo "      https://github.com/new"
-    echo "   2. Repository name should be: nutrition-platform"
-    echo "   3. Make sure you're logged into GitHub"
-    echo "   4. Check your internet connection"
-    echo ""
-    echo "🔑 If authentication fails:"
-    echo "   1. Go to GitHub.com → Settings → Developer settings"
-    echo "   2. Generate a Personal Access Token"
-    echo "   3. Use token as password when prompted"
-    echo ""
-    exit 1
-fi
-
-echo "✅ GitHub upload completed successfully!"
