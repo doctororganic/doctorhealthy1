@@ -1,0 +1,47 @@
+# Coolify Configuration File
+# This file helps Coolify understand your application structure
+
+version: '1.0'
+
+applications:
+  backend:
+    name: nutrition-platform-backend
+    type: dockerfile
+    dockerfile: backend/Dockerfile.go
+    context: backend
+    port: 8080
+    healthcheck:
+      path: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - PORT=8080
+      - ENV=production
+    build:
+      args: []
+
+  frontend:
+    name: nutrition-platform-frontend
+    type: dockerfile
+    dockerfile: frontend-nextjs/Dockerfile
+    context: frontend-nextjs
+    port: 3000
+    healthcheck:
+      path: /
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    build:
+      args: []
+
+# Docker Compose option (alternative)
+compose:
+  file: docker-compose.production.yml
+  services:
+    - backend
+    - frontend
+
